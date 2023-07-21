@@ -699,7 +699,8 @@ bool Connection::TryRestoreConnection(const config::Configuration& cfg,
                 << cfg.GetRegion() << ", connection timeout is "
                 << clientCfg.connectTimeoutMs << ", request timeout is "
                 << clientCfg.requestTimeoutMs << ", max connection is "
-                << clientCfg.maxConnections);
+                << clientCfg.maxConnections << ", user agent is "
+                << clientCfg.userAgent);
 
   SetClientProxy(clientCfg);
 

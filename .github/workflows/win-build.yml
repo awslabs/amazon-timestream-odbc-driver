@@ -174,7 +174,7 @@ jobs:
     - name: Read VERSION file
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       id: getversion
-      run: echo "::set-output name=version::$(cat src/ODBC_DRIVER_VERSION.txt)"
+      run: echo "version=$(cat src/ODBC_DRIVER_VERSION.txt)" >> "$GITHUB_OUTPUT"
 
     - name: "Configure AWS credentials"
       if: ${{ env.SIGNING_ENABLED == 'true' }}
@@ -315,7 +315,7 @@ jobs:
     - name: Read VERSION file
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       id: getversion
-      run: echo "::set-output name=version::$(cat src/ODBC_DRIVER_VERSION.txt)"
+      run: echo "version=$(cat src/ODBC_DRIVER_VERSION.txt)" >> "$GITHUB_OUTPUT"
 
     - name: "Configure AWS credentials"
       if: ${{ env.SIGNING_ENABLED == 'true' }}

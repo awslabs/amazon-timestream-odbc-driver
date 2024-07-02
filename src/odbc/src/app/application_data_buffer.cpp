@@ -42,6 +42,7 @@ ApplicationDataBuffer::ApplicationDataBuffer()
       buflen(0),
       reslen(0),
       byteOffset(0),
+      cellOffset(-1),
       elementOffset(0) {
   // No-op.
 }
@@ -54,6 +55,7 @@ ApplicationDataBuffer::ApplicationDataBuffer(
       buflen(buflen),
       reslen(reslen),
       byteOffset(0),
+      cellOffset(-1),
       elementOffset(0) {
   // No-op.
 }
@@ -64,6 +66,7 @@ ApplicationDataBuffer::ApplicationDataBuffer(const ApplicationDataBuffer& other)
       buflen(other.buflen),
       reslen(other.reslen),
       byteOffset(other.byteOffset),
+      cellOffset(other.cellOffset),
       elementOffset(other.elementOffset) {
   // No-op.
 }
@@ -79,6 +82,7 @@ ApplicationDataBuffer& ApplicationDataBuffer::operator=(
   buflen = other.buflen;
   reslen = other.reslen;
   byteOffset = other.byteOffset;
+  cellOffset = other.cellOffset;
   elementOffset = other.elementOffset;
 
   return *this;
@@ -225,7 +229,7 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
   LOG_DEBUG_MSG("PutValToStrBuffer is called with value " << value);
   std::stringstream converter;
   converter << value;
-  int32_t written = 0;
+  SqlLen written = 0;
   return PutStrToStrBuffer< CharT >(converter.str(), written);
 }
 
@@ -236,13 +240,13 @@ ConversionResult::Type ApplicationDataBuffer::PutValToStrBuffer(
   std::stringstream converter;
   // NOTE: Need to cast to larger integer - or will mistake it for a character.
   converter << static_cast< int32_t >(value);
-  int32_t written = 0;
+  SqlLen written = 0;
   return PutStrToStrBuffer< CharT >(converter.str(), written);
 }
 
 template < typename OutCharT, typename InCharT >
 ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
-    const std::basic_string< InCharT >& value, int32_t& written) {
+    const std::basic_string< InCharT >& value, SqlLen& written) {
   LOG_DEBUG_MSG("PutStrToStrBuffer is called with value " << value);
   written = 0;
 
@@ -251,25 +255,48 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   LOG_DEBUG_MSG("inCharSize is " << inCharSize << ", outCharSize is "
                                  << outCharSize << ", buflen is " << buflen);
 
+  size_t bytesRequired = 0;
+  if (ANSI_STRING_ONLY) {
+    bytesRequired = value.length() * outCharSize;
+  } else {
+    thread_local std::wstring_convert< std::codecvt_utf8< wchar_t >, wchar_t >
+      converter;
+    std::wstring inString = converter.from_bytes(value.c_str());
+    bytesRequired = inString.length() * outCharSize;
+  }
+
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-  if (!dataPtr)
+  if (!dataPtr) {
+    // Provide the total bytes required for the field.
+    if (resLenPtr) {
+      *resLenPtr = bytesRequired;
+    }
     return ConversionResult::Type::AI_SUCCESS;
+  }
 
-  if (buflen < outCharSize)
-    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  SqlUlen currentCellOffset = cellOffset >= 0 ? cellOffset : 0;
+  // Since cellOffset is in bytes, an index needs to be calculated.
+  SqlUlen inCharIndex = currentCellOffset / inCharSize;
 
-  size_t lenWrittenOrRequired = 0;
+  if (inCharIndex >= value.length()) {
+    if (resLenPtr) {
+      *resLenPtr = SQL_NO_TOTAL;
+    }
+    return ConversionResult::Type::AI_NO_DATA;
+  }
+
+  size_t bytesWritten = 0;
   bool isTruncated = false;
   if (inCharSize == 1) {
     if (outCharSize == 2 || outCharSize == 4) {
-      lenWrittenOrRequired = utility::CopyUtf8StringToSqlWcharString(
-          reinterpret_cast< const char* >(value.c_str()),
+      bytesWritten = utility::CopyUtf8StringToSqlWcharString(
+          reinterpret_cast< const char* >(value.c_str() + inCharIndex),
           reinterpret_cast< SQLWCHAR* >(dataPtr), buflen, isTruncated);
     } else if (sizeof(OutCharT) == 1) {
-      lenWrittenOrRequired = utility::CopyUtf8StringToSqlCharString(
-          reinterpret_cast< const char* >(value.c_str()),
+      bytesWritten = utility::CopyUtf8StringToSqlCharString(
+          reinterpret_cast< const char* >(value.c_str() + inCharIndex),
           reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
     } else {
       LOG_ERROR_MSG("Unexpected conversion from UTF8 string.");
@@ -282,20 +309,36 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     assert(false);
   }
 
-  written = static_cast< int32_t >(lenWrittenOrRequired);
+  written = static_cast< SqlLen >(bytesWritten);
   LOG_DEBUG_MSG("written is " << written);
+
+  SqlLen totalBytesWritten = (currentCellOffset / inCharSize) * outCharSize + bytesWritten;
+  // If all data was successfully returned to the buffer, resLenPtr receives the total
+  // number of bytes in the cell, in size outCharSize. If data is being retrieved in parts,
+  // resLenPtr will receive the remaining required data, gradually decreasing in length as
+  // more calls with the same column are made.
+  SqlLen remainingBytesRequired = bytesRequired - totalBytesWritten > 0 ?
+    static_cast<SqlLen>(bytesRequired - bytesWritten) : bytesRequired;
+  LOG_DEBUG_MSG("remainingBytesRequired is " << remainingBytesRequired);
+
   if (resLenPtr) {
-    *resLenPtr = static_cast< SqlLen >(written);
+    *resLenPtr = remainingBytesRequired;
   }
 
-  if (isTruncated)
-    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  if (cellOffset >= 0) {
+    size_t numCharsWritten = bytesWritten / outCharSize;
+    SetCellOffset(cellOffset + numCharsWritten * inCharSize);
+  }
 
-  return ConversionResult::Type::AI_SUCCESS;
+  if (isTruncated) {
+    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  } else {
+    return ConversionResult::Type::AI_SUCCESS;
+  }
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
-    const void* data, size_t len, int32_t& written) {
+    const void* data, size_t len, SqlLen& written) {
   LOG_DEBUG_MSG("PutRawDataToBuffer is called with len " << len);
   SqlLen iLen = static_cast< SqlLen >(len);
 
@@ -310,7 +353,7 @@ ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(
   if (dataPtr != 0 && toCopy > 0)
     memcpy(dataPtr, data, static_cast< size_t >(toCopy));
 
-  written = static_cast< int32_t >(toCopy);
+  written = toCopy;
   LOG_DEBUG_MSG("written is " << written);
 
   return toCopy < iLen ? ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED
@@ -406,13 +449,13 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
 
 ConversionResult::Type ApplicationDataBuffer::PutString(
     const std::string& value) {
-  int32_t written = 0;
+  SqlLen written = 0;
 
   return PutString(value, written);
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutString(
-    const std::string& value, int32_t& written) {
+    const std::string& value, SqlLen& written) {
   using namespace type_traits;
   LOG_DEBUG_MSG("PutString is called with value " << value << ", type is "
                                                   << type);
@@ -436,7 +479,7 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
 
       converter >> numValue;
 
-      written = static_cast< int32_t >(value.size());
+      written = static_cast< SqlLen >(value.size());
 
       return PutNum(numValue);
     }
@@ -451,7 +494,7 @@ ConversionResult::Type ApplicationDataBuffer::PutString(
 
       converter >> numValue;
 
-      written = static_cast< int32_t >(value.size());
+      written = static_cast< SqlLen >(value.size());
 
       return PutNum(numValue);
     }
@@ -529,7 +572,7 @@ ConversionResult::Type ApplicationDataBuffer::PutDecimal(
 
       converter << value;
 
-      int32_t dummy = 0;
+      SqlLen dummy = 0;
 
       return PutString(converter.str(), dummy);
     }

@@ -290,14 +290,12 @@ BOOST_AUTO_TEST_CASE(StatementAttributeCursorType) {
 }
 
 BOOST_AUTO_TEST_CASE(StatementAttributeRowArraySize) {
-  // check that statement array size cannot be set to values other than 1
+  // Check that statement array size can be set to values other than 1.
   ConnectToTS();
 
-  SQLINTEGER actual_row_array_size;
+  SQLULEN actual_row_array_size = 0;
   SQLINTEGER resLen = 0;
 
-  // check that statement array size cannot be set to values not equal to 1
-  // repeat test for different values
   SQLULEN val = 5;
   SQLRETURN ret =
       SQLSetStmtAttr(stmt, SQL_ATTR_ROW_ARRAY_SIZE,
@@ -427,6 +425,27 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowsFetchedPtr) {
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
   BOOST_REQUIRE_EQUAL(rowsFetchedPtr2[0], 1);
+}
+
+BOOST_AUTO_TEST_CASE(StatementAttributeRowsetSize) {
+  ConnectToTS();
+
+  SQLULEN actual_rowset_size;
+  SQLINTEGER resLen = 0;
+
+  SQLULEN val = 5;
+  SQLRETURN ret =
+    SQLSetStmtAttr(stmt, SQL_ROWSET_SIZE,
+      reinterpret_cast<SQLPOINTER>(val), sizeof(val));
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  ret = SQLGetStmtAttr(stmt, SQL_ROWSET_SIZE, reinterpret_cast<SQLPOINTER>(&actual_rowset_size),
+    sizeof(actual_rowset_size), &resLen);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  BOOST_CHECK_EQUAL(actual_rowset_size, 5);
 }
 
 BOOST_AUTO_TEST_CASE(StatementAttributeRowsStatusesPtr) {
@@ -855,9 +874,6 @@ BOOST_AUTO_TEST_CASE(ConnectionSetConnectOptionUnsupportedValue) {
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 
   ret = SQLSetConnectOption(dbc, SQL_RETRIEVE_DATA, SQL_RD_OFF);
-  BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
-
-  ret = SQLSetConnectOption(dbc, SQL_ROWSET_SIZE, 2000);
   BOOST_REQUIRE_EQUAL(ret, SQL_ERROR);
 }
 

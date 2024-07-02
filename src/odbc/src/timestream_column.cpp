@@ -71,7 +71,7 @@ ConversionResult::Type TimestreamColumn::ParseDatum(
   } else if (datum.RowValueHasBeenSet()) {
     retval = ParseRowType(datum, dataBuf);
   } else if (datum.NullValueHasBeenSet()) {
-    dataBuf.PutString("-");
+    dataBuf.PutNull();
     retval = ConversionResult::Type::AI_SUCCESS;
   } else {
     LOG_ERROR_MSG("Unsupported data type");
@@ -236,7 +236,7 @@ ConversionResult::Type TimestreamColumn::ParseArrayType(
 
   std::string result("");
   if (valueVec.empty()) {
-    result = "-";
+    result = "";
   } else {
     result = "[";
     for (const auto& itr : valueVec) {

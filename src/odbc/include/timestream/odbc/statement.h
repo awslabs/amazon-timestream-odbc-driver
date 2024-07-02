@@ -66,18 +66,31 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
                   SqlLen bufferLength, SqlLen* strLengthOrIndicator);
 
   /**
+   * Fetch specified rowset of data from the result set and returns data
+   * for all bound columns. Rowsets can be specified at an absolute or
+   * relative position; bookmarks are not supported.
+   *
+   * @param orientation SQLUSMALLINT Type of fetch.
+   * @param offset SQLLEN Number of the row to fetch.
+   * @param rowCount SQLULEN* Pointer to a buffer in which to return the number of
+   *    rows actually fetched.
+   * @param rowStatusArray SQLUSMALLINT* Pointer to an array in which to return the status of each row.
+   */
+  void ExtendedFetch(SQLUSMALLINT orientation, SQLLEN offset, SQLULEN* rowCount, SQLUSMALLINT* rowStatusArray);
+
+  /**
    * Set column binding offset pointer.
    *
    * @param ptr Column binding offset pointer.
    */
-  void SetColumnBindOffsetPtr(int* ptr);
+  void SetColumnBindOffsetPtr(SqlUlen* ptr);
 
   /**
    * Get column binding offset pointer.
    *
    * @return Column binding offset pointer.
    */
-  int* GetColumnBindOffsetPtr();
+  SqlUlen* GetColumnBindOffsetPtr();
 
   /**
    * Get number of columns in the result set.
@@ -320,7 +333,35 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
   SQLUSMALLINT* GetRowStatusesPtr();
 
   /**
-   * Set current active ARD descriptor
+   * Get the cell offset for the current column.
+   * 
+   * @return Cell offset.
+   */
+  SqlLen GetCellOffset();
+
+  /**
+   * Set cell offset.
+   * 
+   * @param offset The new offset value.
+   */
+  void SetCellOffset(SqlLen offset);
+
+  /**
+   * Get the current column number.
+   * 
+   * @return Current column number.
+   */
+  SQLUSMALLINT GetCurrentColNum();
+
+  /**
+   * Set the current column number.
+   * 
+   * @param colNum SQLUSMALLINT The new current column number.
+   */
+  void SetCurrentColNum(SQLUSMALLINT colNum);
+
+  /**
+   * Set current active ARD descriptor.
    *
    * @param desc Descriptor pointer.
    */
@@ -473,6 +514,21 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
                                         app::ApplicationDataBuffer& buffer);
 
   /**
+   * Fetch specified rowset of data from the result set and returns data
+   * for all bound columns. Rowsets can be specified at an absolute or
+   * relative position; bookmarks are not supported.
+   * 
+   * @param orientation SQLUSMALLINT Type of fetch.
+   * @param offset SQLLEN Number of the row to fetch.
+   * @param rowCount SQLULEN* Pointer to a buffer in which to return the number of
+   *    rows actually fetched.
+   * @param rowStatusArray SQLUSMALLINT* Pointer to an array in which to return the status of each row.
+   * @return Operation result.
+   */
+  SqlResult::Type InternalExtendedFetch(SQLUSMALLINT orientation, SQLLEN offset,
+                                        SQLULEN* rowCount, SQLUSMALLINT* rowStatusArray);
+
+  /**
    * Free resources
    * @param option indicates what needs to be freed
    * @return Operation result.
@@ -482,10 +538,11 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
   /**
    * Close statement.
    * Internal call.
-   *
+   * 
+   * @param bool ignoreErrors Whether to ignore all errors.
    * @return Operation result.
    */
-  SqlResult::Type InternalClose();
+  SqlResult::Type InternalClose(bool ignoreErrors);
 
   /**
    * Process internal SQL command.
@@ -703,10 +760,19 @@ class IGNITE_IMPORT_EXPORT Statement : public diagnostic::DiagnosableAdapter {
   SQLUSMALLINT* rowStatuses;
 
   /** Offset added to pointers to change binding of column data. */
-  int* columnBindOffset;
+  SqlUlen* columnBindOffset;
+
+  /** Offset used to iterate through a cell for variable-length data. */
+  SqlLen cellOffset;
+
+  /** The current column number. Used in SQLGetData. */
+  SqlUlen currentColNum;
 
   /** Row array size. */
   SqlUlen rowArraySize;
+
+  /** Rowset size. */
+  SqlUlen rowsetSize;
 
   /** implicitly allocated ARD */
   std::unique_ptr< Descriptor > ardi;

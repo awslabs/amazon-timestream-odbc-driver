@@ -240,7 +240,7 @@ SqlResult::Type DataQuery::FetchNextRow(app::ColumnBindingMap& columnBindings) {
 
     if (it == columnBindings.end())
       continue;
-  
+
     app::ConversionResult::Type convRes =
         cursor_->ReadColumnToBuffer(i, it->second);
 

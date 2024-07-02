@@ -40,7 +40,7 @@ TimestreamCursor::~TimestreamCursor() {
 bool TimestreamCursor::Increment() {
   LOG_DEBUG_MSG("Increment is called");
 
-  if (curPos_ > 0) {
+  if (curPos_ > 0 && iterator_ < rowVec_.end()) {
     ++iterator_;
   }
   curPos_++;

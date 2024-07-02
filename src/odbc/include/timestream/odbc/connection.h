@@ -52,8 +52,9 @@ struct StatementAttributes {
   SqlUlen bindType;
   SqlUlen concurrency;
   SqlUlen cursorType;
-  SqlUlen retrievData;
+  SqlUlen retrieveData;
   SqlUlen rowsetSize;
+  SqlUlen rowArraySize;
 };
 
 /**
@@ -636,7 +637,14 @@ class IGNITE_IMPORT_EXPORT Connection : public diagnostic::DiagnosableAdapter {
   std::map< const Statement*, std::string > cursorNameMap_;
 
   /** statement attributes struct */
-  StatementAttributes stmtAttr_;
+  StatementAttributes stmtAttr_ = {
+    SQL_PARAM_BIND_BY_COLUMN, // bindType
+    SQL_CONCUR_READ_ONLY,     // concurrency
+    SQL_CURSOR_FORWARD_ONLY,  // cursorType
+    SQL_RD_OFF,               // retrieveData
+    1,                        // rowsetSize
+    1,                        // rowArraySize
+  };
 };
 }  // namespace odbc
 }  // namespace timestream

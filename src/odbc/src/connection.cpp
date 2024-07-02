@@ -1401,17 +1401,10 @@ SqlResult::Type Connection::InternalSetStmtAttribute(SQLUSMALLINT option,
 
         return SqlResult::AI_ERROR;
       }
-      stmtAttr_.retrievData = value;
+      stmtAttr_.retrieveData = value;
       break;
     }
     case SQL_ROWSET_SIZE: {
-      if (value > 1000) {
-        AddStatusRecord(
-            SqlState::SIM001_FUNCTION_NOT_SUPPORTED,
-            "Array size value cannot be set to a value other than 1000");
-
-        return SqlResult::AI_ERROR;
-      }
       stmtAttr_.rowsetSize = value;
       break;
     }

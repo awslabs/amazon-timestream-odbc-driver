@@ -64,7 +64,6 @@ T* GetPointerWithOffset(T* ptr, size_t offset) {
  * return value(bytes):
  *   - 0, if the inBuffer is nullptr or outBufferLenBytes is 0 but outBuffer is
  * not nullptr
- *   - the required output buffer length, if outBuffer is nullptr
  *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
  *   is not 0
  */
@@ -83,7 +82,6 @@ CopyUtf8StringToSqlCharString(const char* inBuffer, SQLCHAR* outBuffer,
  * return value(bytes):
  *   - 0, if the inBuffer is nullptr or outBufferLenBytes is 0 but outBuffer is
  * not nullptr
- *   - the required output buffer length, if outBuffer is nullptr
  *   - copied bytes number, if outBuffer is not nullptr and outBufferLenBytes
  *   is not 0
  */

@@ -271,6 +271,50 @@ BOOST_AUTO_TEST_CASE(TestSQLExecDirect) {
   SQLCloseCursor(stmt);
 }
 
+BOOST_AUTO_TEST_CASE(TestSQLExecDirectWithCloseAndFree) {
+  // Ensures that the order of SQLExecDirect, SQLCloseCursor, and SQLFreeStmt
+  // does not cause a SQL_ERROR.
+  ConnectToTS();
+
+  std::vector< SQLWCHAR > sql = MakeSqlBuffer("SELECT 1");
+
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  SQLCloseCursor(stmt);
+
+  ret = SQLFreeStmt(stmt, SQL_CLOSE);
+
+  // SQLFreeStmt should ignore any and all errors,
+  // returning AI_SUCCESS
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLFetchPastEnd) {
+  // Ensures that attempting to advance the cursor past the
+  // end of the result set does not cause a critical error,
+  // such as a segfault or advancing past a vector's end
+  ConnectToTS();
+
+  std::vector<SQLWCHAR> sql = MakeSqlBuffer("SELECT 1");
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  // The first fetch should succeed
+  ret = SQLFetch(stmt);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+  ret = SQLFetch(stmt);
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+
+  SQLCloseCursor(stmt);
+}
+
 BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.
@@ -810,6 +854,109 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData) {
   SQLGetData(stmt, 1, SQL_C_WCHAR, 0, 0, 0);
 
   SQLFetch(stmt);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharAsciiZeroBufferLength) {
+  // Ensures that calling SQLGetData with a buffer length of zero
+  // returns the required amount of data in the indicator pointer.
+  ConnectToTS();
+
+  // Our query should be for variable-length data. In this case, a varchar.
+  std::vector<SQLWCHAR> sql = MakeSqlBuffer("SELECT device_id FROM data_queries_test_db.TestScalarTypes");
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  ret = SQLFetch(stmt);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  SQLCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLLEN resLen = 0;
+
+  // We will lie to SQLGetData and say the buffer length is 0.
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer, 0, &resLen);
+  // Data is "truncated" and SQL_SUCCESS_WITH_INFO should be returned
+  BOOST_CHECK(ret == SQL_SUCCESS_WITH_INFO);
+
+  BOOST_CHECK(resLen == 8);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharAsciiInParts) {
+  // Ensures that calling SQLGetData with a buffer length of zero
+// returns the required amount of data in the indicator pointer.
+  ConnectToTS();
+
+  // Our query should be for variable-length data. In this case, a varchar.
+  std::vector<SQLWCHAR> sql = MakeSqlBuffer("SELECT device_id FROM data_queries_test_db.TestScalarTypes");
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  ret = SQLFetch(stmt);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  SQLCHAR buffer1[5];
+  SQLLEN resLen = 0;
+
+  // Four chars and a null terminator should be returned.
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer1, 5, &resLen);
+  BOOST_CHECK(ret == SQL_SUCCESS_WITH_INFO);
+  // Each char is one byte.
+  BOOST_CHECK(resLen == 4);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer1, SQL_NTS).length() == 4);
+
+  SQLCHAR buffer2[5];
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer2, 5, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // The last successful call to SQLGetData, when no data is left,
+  // should return the total size of the cell to resLen.
+  BOOST_CHECK_EQUAL(resLen, 8);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer2, SQL_NTS).length() == 4);
+
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer1, SQL_NTS) !=
+    timestream::odbc::utility::SqlCharToString(buffer2, SQL_NTS));
+
+  // An additional call when no data is left should return SQL_NO_DATA
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, buffer2, 5, &resLen);
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+}
+
+BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharUnicodeInParts) {
+  // Ensures that calling SQLGetData can be called multiple times
+  // to retrieve unicode varchar data in parts.
+  ConnectToTS();
+
+  std::vector<SQLWCHAR> sql = MakeSqlBuffer("SELECT device_id FROM data_queries_test_db.TestScalarTypes");
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  ret = SQLFetch(stmt);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  SQLWCHAR buffer1[5];
+  SQLLEN resLen = 0;
+
+  // Four chars and a null terminator should be returned.
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer1, sizeof(SQLWCHAR) * 5, &resLen);
+  // Data is "truncated" so SQL_SUCCESS_WITH_INFO should be returned
+  BOOST_CHECK(ret == SQL_SUCCESS_WITH_INFO);
+  // resLen holds the number of required bytes.
+  // Required data should be 8 chars of size 2 each.
+  BOOST_CHECK_EQUAL(resLen, 8);
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer1, SQL_NTS).length() == 4);
+
+  SQLWCHAR buffer2[5];
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer2, sizeof(SQLWCHAR) * 5, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // The last successful call to SQLGetData, when no data is left,
+  // should return the total size of the cell to resLen.
+  BOOST_CHECK_EQUAL(resLen, 16);
+  BOOST_CHECK_EQUAL(timestream::odbc::utility::SqlWcharToString(buffer2, SQL_NTS).length(), 4);
+
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer1, SQL_NTS) !=
+    timestream::odbc::utility::SqlWcharToString(buffer2, SQL_NTS));
+
+  // An additional call when no data is left should return SQL_NO_DATA
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer2, sizeof(SQLWCHAR) * 5, &resLen);
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr) {

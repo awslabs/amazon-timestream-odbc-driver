@@ -116,8 +116,26 @@ class ApplicationDataBuffer {
    *
    * @param offset Offset.
    */
-  void SetByteOffset(int offset) {
+  void SetByteOffset(SqlUlen offset) {
     this->byteOffset = offset;
+  }
+
+  /**
+   * Get the current cell offset.
+   * 
+   * @return Cell offset.
+   */
+  SqlLen GetCellOffset() {
+    return this->cellOffset;
+  }
+
+  /**
+   * Set cell offset for the current cell.
+   * 
+   * @param offset Offset
+   */
+  void SetCellOffset(SqlLen offset) {
+    this->cellOffset = offset;
   }
 
   /**
@@ -248,7 +266,7 @@ class ApplicationDataBuffer {
    * @param written Number of written characters.
    * @return Conversion result.
    */
-  ConversionResult::Type PutString(const std::string& value, int32_t& written);
+  ConversionResult::Type PutString(const std::string& value, SqlLen& written);
 
   /**
    * Put NULL.
@@ -537,7 +555,7 @@ class ApplicationDataBuffer {
    */
   template < typename OutCharT, typename InCharT >
   ConversionResult::Type PutStrToStrBuffer(
-      const std::basic_string< InCharT >& value, int32_t& written);
+      const std::basic_string< InCharT >& value, SqlLen& written);
 
   /**
    * Put raw data to any buffer.
@@ -548,7 +566,7 @@ class ApplicationDataBuffer {
    * @return Conversion result.
    */
   ConversionResult::Type PutRawDataToBuffer(const void* data, size_t len,
-                                            int32_t& written);
+                                            SqlLen& written);
 
   /**
    * Get int of type T.
@@ -616,7 +634,10 @@ class ApplicationDataBuffer {
   SqlLen* reslen;
 
   /** Current byte offset */
-  int byteOffset;
+  size_t byteOffset;
+
+  /** Current cell offset, meaning byte offset within a cell */
+  SqlLen cellOffset;
 
   /** Current element offset. */
   SqlUlen elementOffset;

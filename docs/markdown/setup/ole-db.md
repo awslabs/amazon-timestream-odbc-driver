@@ -51,6 +51,39 @@ The script executes a query using ADODB (indirectly OLE DB) and loops through th
 OLE DB with the Amazon Timestream ODBC driver can be used with Excel by using the Power Pivot add-in. See [this Microsoft guide](https://support.microsoft.com/en-us/office/start-the-power-pivot-add-in-for-excel-a891a66d-36e3-43fc-81e8-fc4798f39ea8) for how to install the Power Pivot add-in.
 
 Once Power Pivot is installed, in Excel:
+
 1. Go to **Data** and click on **Manage Data Model** to open a new window for Power Pivot.
-2. In Power Pivot, choose **From Other Sources** and then select **Others(OLEDB/ODBC)** and choose **Next**.
-3. Finally, choose **Build** for your connection string and select **Microsoft OLE DB Provider for ODBC Drivers** and select your Timestream DSN.
+  
+  <img src="../images/power-pivot-screenshot-1.png" width="900px"></img>
+
+2. In Power Pivot, choose **From Other Sources**.
+
+  <img src="../images/power-pivot-screenshot-2.png" width="900px"></img>
+
+3. Select **Others(OLEDB/ODBC)** and choose **Next**.
+
+  <img src="../images/power-pivot-screenshot-3.png" width="900px"></img>
+
+4. Choose **Build** for your connection string.
+
+  <img src="../images/power-pivot-screenshot-4.png" width="900px"></img>
+
+5. Select **Microsoft OLE DB Provider for ODBC Drivers**.
+
+  <img src="../images/power-pivot-screenshot-5.png" width="900px"></img>
+
+6. Select your Timestream DSN to build the connection string and choose **Next**.
+
+  <img src="../images/power-pivot-screenshot-6.png" width="900px"></img>
+
+  <img src="../images/power-pivot-screenshot-7.png" width="900px"></img>
+
+7. Select **Write a query that will specify the data to import**.
+
+  <img src="../images/power-pivot-screenshot-8.png" width="900px"></img>
+
+8. Input a valid query for the data you want to import.
+
+  <img src="../images/power-pivot-screenshot-9.png" width="900px"></img>
+
+  <img src="../images/power-pivot-screenshot-10.png" width="900px"></img>

@@ -275,11 +275,11 @@ Running `./scripts/register_driver_unix.sh` and copying `/etc/odbcinst.ini` to `
 ## Code Coverage
 
 ### MacOS/Linux
-To generate code coverage reports you to need to use the debug builds for macOS/Linux, run the tests and use `gcovr` to compile the report. For an installation guide and how to use it look at the official (documentation)[https://gcovr.com/en/stable/index.html].
+To generate code coverage reports you to need to use the debug builds for macOS/Linux, run the tests and use `gcovr` to compile the report. For an installation guide and how to use it look at the [official documentation](https://gcovr.com/en/stable/index.html).
 If you want to check a detailed report generate the with `--html-details` option.
 
 ### Windows
-OpenCppCoverage is used to generate code coverage for windows, for more information check it in the official (documentation)[https://github.com/OpenCppCoverage/OpenCppCoverage]
+OpenCppCoverage is used to generate code coverage for windows, for more information check it in the [official documentation](https://github.com/OpenCppCoverage/OpenCppCoverage).
 
 ## Versioning
 1. To set the version of the ODBC driver, update the `src/ODBC_DRIVER_VERSION.txt` file with the appropriate version.

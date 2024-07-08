@@ -1,8 +1,12 @@
 name: ODBC Driver for Mac
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
   CI_OUTPUT_PATH: "ci-output"
@@ -92,32 +96,6 @@ jobs:
         cd pr-changes
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
-
-    - name: Add access key masks
-      id: add-access-key-masks
-      run: |
-        echo "::add-mask::${{ secrets.AWS_ACCESS_KEY_ID }}";
-        echo "::add-mask::${{ secrets.SECRET_ACCESS_KEY }}";
-
-    - name: View secrets context
-      shell: bash
-      env:
-        SECRETS_CONTEXT: ${{ toJson(secrets) }}
-      run: echo "$SECRETS_CONTEXT"
-
-    - name: Check for AWS access key ID
-      id: check-for-aws-access-key-id
-      env:
-        secret_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      if: env.secret_key_id == ''
-      run: exit 1
-
-    - name: Check for AWS secret access key
-      id: check-for-aws-secret-access-key
-      env:
-        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      if: env.secret_key == ''
-      run: exit 1
 
     - name: configure-aws-credentials-for-tests
       if: success()

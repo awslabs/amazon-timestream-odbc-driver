@@ -8,10 +8,6 @@ on:
     branches:
       - main
 
-permissions:
-  id-token: write
-  contents: read
-
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
@@ -44,6 +40,9 @@ env:
 
 jobs:
   build-mac:
+    permissions:
+      id-token: write
+      contents: read
     runs-on: macos-12
     steps:
     - uses: actions/checkout@v2

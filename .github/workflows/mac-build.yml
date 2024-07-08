@@ -10,13 +10,13 @@ on:
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "${{github.workspace}}/pr-changes/build/odbc/lib"
-  ODBC_BIN_PATH: "${{github.workspace}}/pr-changes/build/odbc/bin"
-  ODBC_BUILD_PATH: "${{github.workspace}}/pr-changes/build/odbc/build"
-  TIMESTREAM_LOG_PATH: "${{github.workspace}}/pr-changes/build/odbc/logs"
+  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin"
+  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/build"
+  TIMESTREAM_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
   TIMESTREAM_LOG_LEVEL: "4"
-  ODBCINSTINI: "${{github.workspace}}/pr-changes/build/odbc/lib/timestream-odbc-install.ini"
-  ODBCINI: "${{github.workspace}}/pr-changes/odbc.ini"
+  ODBCINSTINI: "${{github.workspace}}/build/odbc/lib/timestream-odbc-install.ini"
+  ODBCINI: "${{github.workspace}}/odbc.ini"
   BIG_TABLE_PAGINATION_TEST_ENABLE: "TRUE"
 
   # # AAD Test environment variables. Uncomment out to use GitHub secrets to enable AAD integration tests
@@ -76,12 +76,10 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
-        cd pr-changes
         ./build_mac_release64.sh
 
     - name: update-environment-with-ODBC_DRIVER_VERSION
       run: |
-        cd pr-changes
         read -r ODBC_DRIVER_VERSION < ./src/ODBC_DRIVER_VERSION.txt
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
@@ -89,11 +87,10 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
-        path: ./pr-changes/cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
+        path: ./cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
 
     - name: register-odbc-driver
       run: |
-        cd pr-changes
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
 
@@ -108,7 +105,6 @@ jobs:
     - name: run-unit-tests
       id: rununittests
       run: |
-        cd pr-changes
         mkdir -p "${{env.TIMESTREAM_LOG_PATH}}"
         export DYLD_LIBRARY_PATH=${{env.ODBC_LIB_PATH}}:$DYLD_LIBRARY_PATH     
         ./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false
@@ -117,9 +113,9 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "MacOS Big Sur 11 Build Unit Test Results Check"
-        comment_title: "MacOS Big Sur 11 Build Unit Test Results"
-        files: ./pr-changes/odbc_unit_test_result.xml
+        check_name: "macOS Monterey 12 Build Unit Test Results Check"
+        comment_title: "macOS Monterey 12 Build Unit Test Results"
+        files: ./odbc_unit_test_result.xml
 
     - name: upload-unit-test-file
       if: always() && (steps.rununittests.outcome == 'failure')
@@ -127,13 +123,12 @@ jobs:
       with:
         name: odbc-unit-test-results
         path: |
-          ./pr-changes/odbc_unit_test_result.xml
-          ./pr-changes/build/odbc/logs/timestream_odbc_*.log
+          ./odbc_unit_test_result.xml
+          ./build/odbc/logs/timestream_odbc_*.log
 
     - name: run-integration-tests
       id: runintegrationtests
       run: |
-        cd pr-changes
         export DYLD_LIBRARY_PATH=${{env.ODBC_LIB_PATH}}:$DYLD_LIBRARY_PATH     
         ./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
 
@@ -141,9 +136,9 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "MacOS Big Sur 11 Build Integration Test Results Check"
-        comment_title: "MacOS Big Sur 11 Build Integration Test Results"
-        files: ./pr-changes/odbc_test_result.xml
+        check_name: "macOS Monterey 12 Build Integration Test Results Check"
+        comment_title: "macOS Monterey 12 Build Integration Test Results"
+        files: ./odbc_test_result.xml
 
     - name: upload-integration-test-file
       if: always() && (steps.runintegrationtests.outcome == 'failure')
@@ -151,5 +146,5 @@ jobs:
       with:
         name: odbc-integration-test-results
         path: |
-          ./pr-changes/odbc_test_result.xml
-          ./pr-changes/build/odbc/logs/timestream_odbc_*.log
+          ./odbc_test_result.xml
+          ./build/odbc/logs/timestream_odbc_*.log

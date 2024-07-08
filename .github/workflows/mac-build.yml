@@ -19,9 +19,6 @@ env:
   ODBCINI: "${{github.workspace}}/odbc.ini"
   BIG_TABLE_PAGINATION_TEST_ENABLE: "TRUE"
 
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
   # # AAD Test environment variables. Uncomment out to use GitHub secrets to enable AAD integration tests
   # ENABLE_AAD_TEST: "TRUE"
   # AAD_APP_ID: ${{secrets.AAD_APP_ID}}
@@ -89,19 +86,17 @@ jobs:
 
     - name: Check for AWS access key ID
       id: check-for-aws-access-key-id
-      run: |
-        if [ "${{ env.AWS_ACCESS_KEY_ID }}" = "" ]; then
-          echo "AWS_ACCESS_KEY_ID is not set";
-        else
-          echo "AWS_ACCESS_KEY_ID has been set";
+      env:
+        secret_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      if: env.secret_key_id == ''
+      run: exit 1
 
     - name: Check for AWS secret access key
       id: check-for-aws-secret-access-key
-      run: |
-        if [ "${{ env.AWS_SECRET_ACCESS_KEY }}" = "" ]; then
-          echo "AWS_SECRET_ACCESS_KEY is not set";
-        else
-          echo "AWS_SECRET_ACCESS_KEY has been set";
+      env:
+        secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      if: env.secret_key == ''
+      run: exit 1
 
     - name: configure-aws-credentials-for-tests
       if: success()

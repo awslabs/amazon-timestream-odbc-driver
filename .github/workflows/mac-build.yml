@@ -40,9 +40,6 @@ env:
 
 jobs:
   build-mac:
-    permissions:
-      id-token: write
-      contents: read
     runs-on: macos-12
     steps:
     - uses: actions/checkout@v2
@@ -86,6 +83,22 @@ jobs:
       run: |
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
+
+    - name: Check for AWS access key ID
+      id: check-for-aws-access-key-id
+      run: |
+        if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+          echo "AWS_ACCESS_KEY_ID is not set"
+        else
+          echo "AWS_ACCESS_KEY_ID has been set"
+
+    - name: Check for AWS secret access key
+      id: check-for-aws-secret-access-key
+      run: |
+        if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+          echo "AWS_SECRET_ACCESS_KEY is not set"
+        else
+          echo "AWS_SECRET_ACCESS_KEY has been set"
 
     - name: configure-aws-credentials-for-tests
       if: success()

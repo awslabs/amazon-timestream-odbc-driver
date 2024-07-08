@@ -84,6 +84,12 @@ jobs:
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
 
+    - name: Add access key masks
+      id: add-access-key-masks
+      run: |
+        echo "::add-mask::${{ secrets.AWS_ACCESS_KEY_ID }}";
+        echo "::add-mask::${{ secrets.SECRET_ACCESS_KEY }}";
+
     - name: Check for AWS access key ID
       id: check-for-aws-access-key-id
       env:

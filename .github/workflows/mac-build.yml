@@ -7,16 +7,18 @@ on:
   pull_request:
     branches:
       - main
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
 env:
   CI_OUTPUT_PATH: "ci-output"
-  ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
-  ODBC_BIN_PATH: "${{github.workspace}}/build/odbc/bin"
-  ODBC_BUILD_PATH: "${{github.workspace}}/build/odbc/build"
-  TIMESTREAM_LOG_PATH: "${{github.workspace}}/build/odbc/logs"
+  ODBC_LIB_PATH: "${{github.workspace}}/pr-changes/build/odbc/lib"
+  ODBC_BIN_PATH: "${{github.workspace}}/pr-changes/build/odbc/bin"
+  ODBC_BUILD_PATH: "${{github.workspace}}/pr-changes/build/odbc/build"
+  TIMESTREAM_LOG_PATH: "${{github.workspace}}/pr-changes/build/odbc/logs"
   TIMESTREAM_LOG_LEVEL: "4"
-  ODBCINSTINI: "${{github.workspace}}/build/odbc/lib/timestream-odbc-install.ini"
-  ODBCINI: "${{github.workspace}}/odbc.ini"
+  ODBCINSTINI: "${{github.workspace}}/pr-changes/build/odbc/lib/timestream-odbc-install.ini"
+  ODBCINI: "${{github.workspace}}/pr-changes/odbc.ini"
   BIG_TABLE_PAGINATION_TEST_ENABLE: "TRUE"
 
   # # AAD Test environment variables. Uncomment out to use GitHub secrets to enable AAD integration tests
@@ -42,11 +44,21 @@ jobs:
   build-mac:
     runs-on: macos-12
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout base branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.base.sha }}
+
+    - name: Checkout PR
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        path: pr-changes
 
     - name: run-cppcheck
       run: |
         brew install cppcheck
+        cd pr-changes
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()
@@ -66,10 +78,12 @@ jobs:
 
     - name: configure-and-build-driver
       run: |
+        cd pr-changes
         ./build_mac_release64.sh
 
     - name: update-environment-with-ODBC_DRIVER_VERSION
       run: |
+        cd pr-changes
         read -r ODBC_DRIVER_VERSION < ./src/ODBC_DRIVER_VERSION.txt
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
@@ -77,10 +91,11 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
-        path: ./cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
+        path: ./pr-changes/cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
 
     - name: register-odbc-driver
       run: |
+        cd pr-changes
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
 
@@ -121,6 +136,7 @@ jobs:
     - name: run-unit-tests
       id: rununittests
       run: |
+        cd pr-changes
         mkdir -p "${{env.TIMESTREAM_LOG_PATH}}"
         export DYLD_LIBRARY_PATH=${{env.ODBC_LIB_PATH}}:$DYLD_LIBRARY_PATH     
         ./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false
@@ -131,7 +147,7 @@ jobs:
       with:
         check_name: "MacOS Big Sur 11 Build Unit Test Results Check"
         comment_title: "MacOS Big Sur 11 Build Unit Test Results"
-        files: ./odbc_unit_test_result.xml
+        files: ./pr-changes/odbc_unit_test_result.xml
 
     - name: upload-unit-test-file
       if: always() && (steps.rununittests.outcome == 'failure')
@@ -139,12 +155,13 @@ jobs:
       with:
         name: odbc-unit-test-results
         path: |
-          ./odbc_unit_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log
+          ./pr-changes/odbc_unit_test_result.xml
+          ./pr-changes/build/odbc/logs/timestream_odbc_*.log
 
     - name: run-integration-tests
       id: runintegrationtests
       run: |
+        cd pr-changes
         export DYLD_LIBRARY_PATH=${{env.ODBC_LIB_PATH}}:$DYLD_LIBRARY_PATH     
         ./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
 
@@ -154,7 +171,7 @@ jobs:
       with:
         check_name: "MacOS Big Sur 11 Build Integration Test Results Check"
         comment_title: "MacOS Big Sur 11 Build Integration Test Results"
-        files: ./odbc_test_result.xml
+        files: ./pr-changes/odbc_test_result.xml
 
     - name: upload-integration-test-file
       if: always() && (steps.runintegrationtests.outcome == 'failure')
@@ -162,5 +179,5 @@ jobs:
       with:
         name: odbc-integration-test-results
         path: |
-          ./odbc_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log
+          ./pr-changes/odbc_test_result.xml
+          ./pr-changes/build/odbc/logs/timestream_odbc_*.log

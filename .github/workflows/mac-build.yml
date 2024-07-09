@@ -40,7 +40,7 @@ env:
 
 jobs:
   build-mac:
-    runs-on: macos-13
+    runs-on: macos-12
     steps:
     - uses: actions/checkout@v4
 
@@ -58,6 +58,9 @@ jobs:
     - name: get-dependencies
       run: |
         brew tap homebrew/services
+        brew unlink unixodbc
+        brew install libiodbc
+        brew link --overwrite --force libiodbc
         brew install cmake
         brew install boost
 
@@ -80,6 +83,7 @@ jobs:
       run: |
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
+        cat $ODBCINSTINI
 
     - name: configure-aws-credentials-for-tests
       if: success()

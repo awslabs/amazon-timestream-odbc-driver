@@ -42,7 +42,7 @@ jobs:
   build-mac-debug:
     runs-on: macos-12
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: run-cppcheck
       run: |
@@ -65,8 +65,8 @@ jobs:
         brew install boost
         pip3 install gcovr
 
-# if action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
-# recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors would occur
+# If action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
+# recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors will occur
     - name: set-PATH
       run: |
         echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH

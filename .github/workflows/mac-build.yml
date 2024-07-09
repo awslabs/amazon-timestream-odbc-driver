@@ -47,7 +47,6 @@ jobs:
     - name: run-cppcheck
       run: |
         brew install cppcheck
-        cd pr-changes
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()

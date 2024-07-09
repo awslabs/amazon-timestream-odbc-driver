@@ -96,8 +96,9 @@ jobs:
     - name: set-session-token
       if: success()
       run: |
-        echo "export AWS_SESSION_TOKEN=$(aws sts get-session-token | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
+        AWS_SESSION_TOKEN="$(aws sts get-session-token | jq -r '.Credentials.SessionToken')"
         echo "::add-mask::$AWS_SESSION_TOKEN"
+        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
 
     - name: run-unit-tests
       id: rununittests

@@ -109,7 +109,7 @@ jobs:
 
     - name: upload-unit-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
         check_name: "macOS Monterey 12 Build Unit Test Results Check"
         comment_title: "macOS Monterey 12 Build Unit Test Results"
@@ -132,7 +132,7 @@ jobs:
 
     - name: upload-integration-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
         check_name: "macOS Monterey 12 Build Integration Test Results Check"
         comment_title: "macOS Monterey 12 Build Integration Test Results"

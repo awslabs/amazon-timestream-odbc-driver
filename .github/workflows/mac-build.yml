@@ -40,7 +40,7 @@ env:
 
 jobs:
   build-mac:
-    runs-on: macos-14
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v4
 
@@ -58,11 +58,11 @@ jobs:
     - name: get-dependencies
       run: |
         brew tap homebrew/services
+        brew unlink unixodbc
         brew install libiodbc
         brew link --overwrite --force libiodbc
         brew install cmake
         brew install boost
-        brew install jq
 
     - name: configure-and-build-driver
       run: |
@@ -91,13 +91,6 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
-
-    - name: set-session-token
-      if: success()
-      run: |
-        AWS_SESSION_TOKEN="$(aws sts get-session-token | jq -r '.Credentials.SessionToken')"
-        echo "::add-mask::$AWS_SESSION_TOKEN"
-        echo "AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN" >> $GITHUB_ENV
 
     - name: run-unit-tests
       id: rununittests

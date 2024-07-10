@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Use GITHUB_OUTPUT instead of set-output command for Windows GitHub action workflow.
-- Updated macOS workflow to use macos-12 runner.
+- Update macOS workflow to use macos-12 runner.
 - Update configure-aws-credentials to v4 for all GitHub action workflows.
 - Use publish-unit-test-result macos@v2 for macOS GitHub action workflow.
 - Make run_cppcheck scripts use check-level exhaustive.
@@ -28,8 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix error cause by cursor moving past the end of a result set (#10).
 - Fix the character "-" being returned for null values (#12).
-- Fixed SQLFreeStmt not ignoring errors when freeing.
-- Fixed various spelling errors in documentation and in comments.
+- Fix SQLFreeStmt not ignoring errors when freeing.
+- Fix various spelling errors in documentation and in comments.
 
 ### Removed
 

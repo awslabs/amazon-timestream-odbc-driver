@@ -23,7 +23,8 @@ done
 SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 PROJECT_DIR="$SCRIPT_DIR/.."
-ODBC_LIB_PATH="$PROJECT_DIR/build/odbc/lib"
+ODBC_LIB_PATH="$(cd $PROJECT_DIR/build/odbc/lib && pwd)"
+#ODBC_LIB_PATH="$PROJECT_DIR/build/odbc/lib"
 if [[ "$OSTYPE" == "linux"* ]]; then
   ODBC_LIB_FILENAME="$ODBC_LIB_PATH/libtimestream-odbc.so"
 elif [[ "$OSTYPE" == "darwin"* ]]; then

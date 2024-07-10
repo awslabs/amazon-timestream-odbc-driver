@@ -38,6 +38,7 @@ struct DescriptorHeader {
   SQLLEN* bindOffsetPtr;
   SQLINTEGER bindType;
   SQLSMALLINT count;
+  SQLULEN rowsetSize;
   SQLULEN* rowsProcessedPtr;
 };
 

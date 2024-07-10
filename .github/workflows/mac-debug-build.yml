@@ -40,9 +40,9 @@ env:
 
 jobs:
   build-mac-debug:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: run-cppcheck
       run: |
@@ -65,8 +65,8 @@ jobs:
         brew install boost
         pip3 install gcovr
 
-# if action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
-# recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors would occur
+# If action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
+# recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors will occur
     - name: set-PATH
       run: |
         echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
@@ -98,7 +98,7 @@ jobs:
 
     - name: configure-aws-credentials-for-tests
       if: success()
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -115,8 +115,8 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "MacOS Big Sur 11 Debug Build Unit Test Results Check"
-        comment_title: "MacOS Big Sur 11 Debug Build Unit Test Results"
+        check_name: "macOS Monterey 12 Debug Build Unit Test Results Check"
+        comment_title: "macOS Monterey 12 Debug Build Unit Test Results"
         files: ./odbc_unit_test_result.xml
 
     - name: run-integration-tests
@@ -137,8 +137,8 @@ jobs:
       if: always()
       uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
       with:
-        check_name: "MacOS Big Sur 11 Debug Build Integration Test Results Check"
-        comment_title: "MacOS Big Sur 11 Debug Build Integration Test Results"
+        check_name: "macOS Monterey 12 Debug Build Integration Test Results Check"
+        comment_title: "macOS Monterey 12 Debug Build Integration Test Results"
         files: ./odbc_test_result.xml
 
     - name: upload-test-file
@@ -173,7 +173,7 @@ jobs:
     
     - name: Add Header for Code Coverage Summary Report
       run: |
-        echo "## MacOS Big Sur 11 Debug Build Code Coverage Unit and Integration Test Result" > coverage-cobertura.md
+        echo "## macOS Monterey 12 Debug Build Code Coverage Unit and Integration Test Result" > coverage-cobertura.md
         cat code-coverage-results.md >> coverage-cobertura.md
     
     - name: Add Coverage PR Comment

@@ -40,9 +40,9 @@ env:
 
 jobs:
   build-mac:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: run-cppcheck
       run: |
@@ -50,7 +50,7 @@ jobs:
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cppcheck-results
         path: cppcheck-results.log
@@ -74,7 +74,7 @@ jobs:
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: upload-package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
         path: ./cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
@@ -83,10 +83,11 @@ jobs:
       run: |
         chmod +x scripts/register_driver_unix.sh
         ./scripts/register_driver_unix.sh
+        cat $ODBCINSTINI
 
     - name: configure-aws-credentials-for-tests
       if: success()
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -101,15 +102,15 @@ jobs:
 
     - name: upload-unit-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
-        check_name: "MacOS Big Sur 11 Build Unit Test Results Check"
-        comment_title: "MacOS Big Sur 11 Build Unit Test Results"
+        check_name: "macOS Monterey 12 Build Unit Test Results Check"
+        comment_title: "macOS Monterey 12 Build Unit Test Results"
         files: ./odbc_unit_test_result.xml
 
     - name: upload-unit-test-file
       if: always() && (steps.rununittests.outcome == 'failure')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-unit-test-results
         path: |
@@ -124,15 +125,15 @@ jobs:
 
     - name: upload-integration-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
-        check_name: "MacOS Big Sur 11 Build Integration Test Results Check"
-        comment_title: "MacOS Big Sur 11 Build Integration Test Results"
+        check_name: "macOS Monterey 12 Build Integration Test Results Check"
+        comment_title: "macOS Monterey 12 Build Integration Test Results"
         files: ./odbc_test_result.xml
 
     - name: upload-integration-test-file
       if: always() && (steps.runintegrationtests.outcome == 'failure')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-integration-test-results
         path: |

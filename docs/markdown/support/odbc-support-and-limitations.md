@@ -317,6 +317,7 @@ In both `SQLSetStmtAttr` and `SQLGetStmtAttr`
 |SQL_ATTR_METADATA_ID|SQL_FALSE| yes |
 |SQL_ATTR_PARAM_BIND_TYPE| SQL_BIND_BY_COLUMN | no |
 |SQL_ATTR_ROW_ARRAY_SIZE| 1 | yes |
+|SQL_ROWSET_SIZE| 1 | yes |
 |SQL_ATTR_ROW_BIND_OFFSET_PTR| column bind offset pointer | yes |
 |SQL_ATTR_ROW_BIND_TYPE| SQL_BIND_BY_COLUMN | no |
 |SQL_ATTR_ROW_STATUS_PTR| row status pointer | yes| 
@@ -435,7 +436,7 @@ Wrapped in "()". Each element is separated by ",".
 (1,2,3)
 ```
 
-For null it could only be fetched as a string and the result is "-".
+Null values are represented with an empty string within arrays.
 
 Please refer to [Timestream Data Types](https://docs.aws.amazon.com/timestream/latest/developerguide/supported-data-types.html) for more info.
 

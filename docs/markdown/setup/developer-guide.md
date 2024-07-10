@@ -40,14 +40,14 @@ C/C++ usage and formatting.
 
 - AWS Logs
 
-  This ODBC driver uses AWS logs beside its own logging. Please see how AWS Logs work in their [official document](https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/logging.html). The logs will be stored inthe executable directory following the default naming pattern of `aws_sdk_<date>.log`.
+  This ODBC driver uses AWS logs beside its own logging. Please see how AWS Logs work in their [official document](https://docs.aws.amazon.com/sdk-for-cpp/v1/developer-guide/logging.html). The logs will be stored in the executable directory following the default naming pattern of `aws_sdk_<date>.log`.
 
 ### Test Data
 Test data are needed for tests to run successfully and they only need to be loaded once for each AWS account. Check [here](#data-population-for-testing) for instructions on loading the test data.
 
 ## Windows
 
-1. Microsoft Visual Studio (Community 2019 Verified)
+1. Microsoft Visual Studio (Community 2022 Verified)
    1. Desktop Development for C++
    2. Visual Studio core editor
    3. C++ ATL for latest v142 build tools (x86 & x64)
@@ -275,11 +275,11 @@ Running `./scripts/register_driver_unix.sh` and copying `/etc/odbcinst.ini` to `
 ## Code Coverage
 
 ### MacOS/Linux
-To generate code coverage reports you to need to use the debug builds for macOS/Linux, run the tests and use `gcovr` to compile the report. For an installation guide and how to use it look at the official (documentation)[https://gcovr.com/en/stable/index.html].
+To generate code coverage reports you to need to use the debug builds for macOS/Linux, run the tests and use `gcovr` to compile the report. For an installation guide and how to use it look at the [official documentation](https://gcovr.com/en/stable/index.html).
 If you want to check a detailed report generate the with `--html-details` option.
 
 ### Windows
-OpenCppCoverage is used to generate code coverage for windows, for more information check it in the official (documentation)[https://github.com/OpenCppCoverage/OpenCppCoverage]
+OpenCppCoverage is used to generate code coverage for windows, for more information check it in the [official documentation](https://github.com/OpenCppCoverage/OpenCppCoverage).
 
 ## Versioning
 1. To set the version of the ODBC driver, update the `src/ODBC_DRIVER_VERSION.txt` file with the appropriate version.
@@ -446,18 +446,18 @@ Reading and writing data on Timestream requires corresponding permissions. For r
 ## Integration Tests
 
 ### IAM Profile Tests
-1. The IAM profile tests are disabled by default because they require valid IAM profiles. They can be enabled by exporting environment variable `ENABLE_PROFILE_TEST` to `true`. Follow below instructions for setting up valid IAM profiles and required environmenr variables. 
+1. The IAM profile tests are disabled by default because they require valid IAM profiles. They can be enabled by exporting environment variable `ENABLE_PROFILE_TEST` to `true`. Follow below instructions for setting up valid IAM profiles and required environment variables. 
 #### Windows
-1. `cd` to repository root. Set environment variable REPOSITORY_ROOT to your repository root.
+1. `cd` to repository root. Set the environment variable `REPOSITORY_ROOT` to your repository root.
 2. Run `.\src\tests\input\create_credentials_file.ps1` to create credential files for testing. Note that this script will write AWS IAM credentials file `src\tests\input\credentials`.
 3. Set environment variable AWS_SHARED_CREDENTIALS_FILE to the newly created credentials file.
 
 #### Linux or macOS
-1. `cd` to repository root. Set environment variable REPOSITORY_ROOT to your repository root
+1. `cd` to repository root. Set environment variable `REPOSITORY_ROOT` to your repository root
 
     `export REPOSITORY_ROOT=<your repository root>`
 2. Run `./src/tests/input/create_credentials_file.sh` from the respository root to create credential files for testing. Note that this script will write AWS IAM credentials file `src/tests/input/credentials`.
-3. Set environment variable AWS_SHARED_CREDENTIALS_FILE to the newly created credentials file.
+3. Set environment variable `AWS_SHARED_CREDENTIALS_FILE` to the newly created credentials file.
 
     `export AWS_SHARED_CREDENTIALS_FILE=$REPOSITORY_ROOT/src/tests/input/credentials`
 
@@ -478,9 +478,9 @@ Reading and writing data on Timestream requires corresponding permissions. For r
    | `AAD_CLIENT_SECRET`  | AADClientSecret                        |
 
 ### Okta Authentication Tests
-1. The Okta authentication tests are disabled by default because they require a valid Okta test account. They can be enabled by exporting environment variable `ENABLE_OKTA_TEST` to `true`.
+1. The Okta authentication tests are disabled by default because they require a valid Okta test account. They can be enabled by exporting the environment variable `ENABLE_OKTA_TEST` with the value `true`.
 
-2. To run Okta authentication test, the environment variables in the following table need to be configured with correct values.  Refer to [Okta Authentication Setup Guide](Okta-setup.md) for instructions on setting up an Okta authentication.
+2. To run the Okta authentication tests, the environment variables in the following table need to be configured with correct values.  Refer to [Okta Authentication Setup Guide](Okta-setup.md) for instructions on setting up an Okta authentication.
 
    | Variable Name |  Corresponding Connection String Option   |
    |---------------|-------------------------------------------|
@@ -493,7 +493,7 @@ Reading and writing data on Timestream requires corresponding permissions. For r
 Ensure `OKTA_HOST` does not include `https://` or `http://`.
 
 ### Big Table Pagination Tests
-Big table pagination tests are time-consuming. To save time for integration test， they are disabled by default. They could be enabled by export environment variable `BIG_TABLE_PAGINATION_TEST_ENABLE` to `true`.
+Big table pagination tests are time-consuming. To save time for integration test, they are disabled by default. They can be enabled by exporting the environment variable `BIG_TABLE_PAGINATION_TEST_ENABLE` with the value `true`.
 
 ### Proxy Manual Test on Windows
 For setting up connection proxy properties, see [connection proxy guide.](connection-proxy-guide.md).
@@ -504,8 +504,8 @@ For setting up connection proxy properties, see [connection proxy guide.](connec
 3. Run proxy server at port 9999
    `cd proxy-test-server/examples`
    `node proxy.js`
-4. Set environment variable TS_PROXY_HOST, TS_PROXY_PORT and TS_PROXY_SCHEME.
-5. Start DSN window and create a connection to Timestream. Click 'Test' button to verify.
+4. Set environment variables `TS_PROXY_HOST`, `TS_PROXY_PORT`, and `TS_PROXY_SCHEME`.
+5. Start DSN window and create a connection to Timestream. Click the 'Test' button to verify.
 
 ## Test Results
 Unit test results can be viewed in `odbc_unit_test_result.xml` and integration test results can be viewed in `odbc_test_result.xml`.

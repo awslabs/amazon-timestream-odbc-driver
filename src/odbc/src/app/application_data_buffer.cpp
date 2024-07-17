@@ -319,7 +319,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   // resLenPtr will receive the remaining required data, gradually decreasing in length as
   // more calls with the same column are made.
   SqlLen remainingBytesRequired = bytesRequired - totalBytesWritten > 0 ?
-    static_cast<SqlLen>(bytesRequired - bytesWritten) : bytesRequired;
+    static_cast<SqlLen>(bytesRequired - totalBytesWritten) : bytesRequired;
   LOG_DEBUG_MSG("remainingBytesRequired is " << remainingBytesRequired);
 
   if (resLenPtr) {

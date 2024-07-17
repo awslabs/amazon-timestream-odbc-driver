@@ -881,8 +881,8 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharAsciiZeroBufferLength) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharAsciiInParts) {
-  // Ensures that calling SQLGetData with a buffer length of zero
-// returns the required amount of data in the indicator pointer.
+  // Ensures that SQLGetData can be used to retrieve a varchar
+  // in parts to a SQLCHAR buffer.
   ConnectToTS();
 
   // Our query should be for variable-length data. In this case, a varchar.
@@ -893,37 +893,89 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharAsciiInParts) {
   ret = SQLFetch(stmt);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLCHAR buffer1[5];
+  // The data is 8 characters, we will get it 2 characters at a time.
+  // Two characters and a null terminator should be returned for each
+  // SQLGetData call.
+  SQLCHAR buffer1[3];
   SQLLEN resLen = 0;
 
-  // Four chars and a null terminator should be returned.
-  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer1, 5, &resLen);
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer1, sizeof(SQLCHAR) * 3, &resLen);
   BOOST_CHECK(ret == SQL_SUCCESS_WITH_INFO);
-  // Each char is one byte.
-  BOOST_CHECK(resLen == 4);
-  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer1, SQL_NTS).length() == 4);
+  // There should be 6 more characters left.
+  BOOST_CHECK(resLen == sizeof(SQLCHAR) * 6);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer1, SQL_NTS).length() == 2);
 
-  SQLCHAR buffer2[5];
-  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer2, 5, &resLen);
+  SQLCHAR buffer2[3];
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer2, sizeof(SQLCHAR) * 3, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // There should be 4 more characters left.
+  BOOST_CHECK_EQUAL(resLen, sizeof(SQLCHAR) * 4);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer2, SQL_NTS).length() == 2);
+
+  SQLCHAR buffer3[3];
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer3, sizeof(SQLCHAR) * 3, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // There should be 2 more characters left.
+  BOOST_CHECK_EQUAL(resLen, sizeof(SQLCHAR) * 2);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer3, SQL_NTS).length() == 2);
+
+  SQLCHAR buffer4[3];
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &buffer4, sizeof(SQLCHAR) * 3, &resLen);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   // The last successful call to SQLGetData, when no data is left,
-  // should return the total size of the cell to resLen.
-  BOOST_CHECK_EQUAL(resLen, 8);
-  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer2, SQL_NTS).length() == 4);
+  // should return the total size of the cell.
+  BOOST_CHECK_EQUAL(resLen, sizeof(SQLCHAR) * 8);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer4, SQL_NTS).length() == 2);
 
-  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(buffer1, SQL_NTS) !=
-    timestream::odbc::utility::SqlCharToString(buffer2, SQL_NTS));
-
-  // An additional call when no data is left should return SQL_NO_DATA
-  ret = SQLGetData(stmt, 1, SQL_C_CHAR, buffer2, 5, &resLen);
+  // An additional call when no data is left should return SQL_NO_DATA.
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, buffer4, sizeof(SQLCHAR) * 3, &resLen);
   BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+
+  SQLCloseCursor(stmt);
+
+  // Combine all parts.
+  SQLCHAR combinedVarchar[9];
+  // All buffers contain two characters and one null terminator.
+  for (int i = 0; i < 2; i++) {
+    combinedVarchar[i] = buffer1[i];
+    combinedVarchar[i + 2] = buffer2[i];
+    combinedVarchar[i + 4] = buffer3[i];
+    combinedVarchar[i + 6] = buffer4[i];
+  }
+  // Add null terminator.
+  combinedVarchar[8] = 0;
+
+  // Get the full varchar from Timestream, in order to
+  // compare with the varchar we built from parts.
+  SQLCHAR fullVarchar[9];
+
+  ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  ret = SQLFetch(stmt);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, &fullVarchar, sizeof(SQLCHAR) * 9, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // There should be no more characters left. The full cell length should be returned.
+  BOOST_CHECK(resLen == sizeof(SQLCHAR) * 8);
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(fullVarchar, SQL_NTS).length() == 8);
+
+  // An additional call when no data is left should return SQL_NO_DATA.
+  ret = SQLGetData(stmt, 1, SQL_C_CHAR, fullVarchar, sizeof(SQLCHAR) * 9, &resLen);
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+
+  // Confirm that our varchar built from parts equals the full varchar.
+  BOOST_CHECK(timestream::odbc::utility::SqlCharToString(combinedVarchar, SQL_NTS) ==
+    timestream::odbc::utility::SqlCharToString(fullVarchar, SQL_NTS));
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharUnicodeInParts) {
-  // Ensures that calling SQLGetData can be called multiple times
-  // to retrieve unicode varchar data in parts.
+  // Ensures that SQLGetData can be used to retrieve a varchar
+  // in parts to a SQLWCHAR buffer.
   ConnectToTS();
 
+  // Our query should be for variable-length data. In this case, a varchar.
   std::vector<SQLWCHAR> sql = MakeSqlBuffer("SELECT device_id FROM data_queries_test_db.TestScalarTypes");
   SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
   // Expect success
@@ -931,32 +983,81 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharUnicodeInParts) {
   ret = SQLFetch(stmt);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
 
-  SQLWCHAR buffer1[5];
+  // The data is 8 characters, we will get it 2 characters at a time.
+  // Two characters and a null terminator should be returned for each
+  // SQLGetData call.
+  SQLWCHAR buffer1[3];
   SQLLEN resLen = 0;
 
-  // Four chars and a null terminator should be returned.
-  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer1, sizeof(SQLWCHAR) * 5, &resLen);
-  // Data is "truncated" so SQL_SUCCESS_WITH_INFO should be returned
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, &buffer1, sizeof(SQLWCHAR) * 3, &resLen);
   BOOST_CHECK(ret == SQL_SUCCESS_WITH_INFO);
-  // resLen holds the number of required bytes.
-  // Required data should be 8 chars of size 2 each.
-  BOOST_CHECK_EQUAL(resLen, 8);
-  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer1, SQL_NTS).length() == 4);
+  // There should be 6 more characters left.
+  BOOST_CHECK(resLen == sizeof(SQLWCHAR) * 6);
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer1, SQL_NTS).length() == 2);
 
-  SQLWCHAR buffer2[5];
-  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer2, sizeof(SQLWCHAR) * 5, &resLen);
+  SQLWCHAR buffer2[3];
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, &buffer2, sizeof(SQLWCHAR) * 3, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // There should be 4 more characters left.
+  BOOST_CHECK_EQUAL(resLen, sizeof(SQLWCHAR) * 4);
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer2, SQL_NTS).length() == 2);
+
+  SQLWCHAR buffer3[3];
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, &buffer3, sizeof(SQLWCHAR) * 3, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // There should be 2 more characters left.
+  BOOST_CHECK_EQUAL(resLen, sizeof(SQLWCHAR) * 2);
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer3, SQL_NTS).length() == 2);
+
+  SQLWCHAR buffer4[3];
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, &buffer4, sizeof(SQLWCHAR) * 3, &resLen);
   ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
   // The last successful call to SQLGetData, when no data is left,
-  // should return the total size of the cell to resLen.
-  BOOST_CHECK_EQUAL(resLen, 16);
-  BOOST_CHECK_EQUAL(timestream::odbc::utility::SqlWcharToString(buffer2, SQL_NTS).length(), 4);
+  // should return the total size of the cell.
+  BOOST_CHECK_EQUAL(resLen, sizeof(SQLWCHAR) * 8);
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer4, SQL_NTS).length() == 2);
 
-  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(buffer1, SQL_NTS) !=
-    timestream::odbc::utility::SqlWcharToString(buffer2, SQL_NTS));
-
-  // An additional call when no data is left should return SQL_NO_DATA
-  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer2, sizeof(SQLWCHAR) * 5, &resLen);
+  // An additional call when no data is left should return SQL_NO_DATA.
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, buffer4, sizeof(SQLWCHAR) * 3, &resLen);
   BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+
+  SQLCloseCursor(stmt);
+
+  // Combine all parts.
+  SQLWCHAR combinedVarchar[9];
+  // All buffers contain two characters and one null terminator.
+  for (int i = 0; i < 2; i++) {
+    combinedVarchar[i] = buffer1[i];
+    combinedVarchar[i + 2] = buffer2[i];
+    combinedVarchar[i + 4] = buffer3[i];
+    combinedVarchar[i + 6] = buffer4[i];
+  }
+  // Add null terminator.
+  combinedVarchar[8] = 0;
+
+  // Get the full varchar from Timestream, in order to
+  // compare with the varchar we built from parts.
+  SQLWCHAR fullVarchar[9];
+
+  ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+  // Expect success
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  ret = SQLFetch(stmt);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, &fullVarchar, sizeof(SQLWCHAR) * 9, &resLen);
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+  // There should be no more characters left. The full cell length should be returned.
+  BOOST_CHECK(resLen == sizeof(SQLWCHAR) * 8);
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(fullVarchar, SQL_NTS).length() == 8);
+
+  // An additional call when no data is left should return SQL_NO_DATA.
+  ret = SQLGetData(stmt, 1, SQL_WCHAR, fullVarchar, sizeof(SQLWCHAR) * 9, &resLen);
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+
+  // Confirm that our varchar built from parts equals the full varchar.
+  BOOST_CHECK(timestream::odbc::utility::SqlWcharToString(combinedVarchar, SQL_NTS) ==
+    timestream::odbc::utility::SqlWcharToString(fullVarchar, SQL_NTS));
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLGetEnvAttr) {

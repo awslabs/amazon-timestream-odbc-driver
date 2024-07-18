@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.1](https://github.com/awslabs/amazon-timestream-odbc-driver/releases/tag/v2.1.1) - 2024-07-18
+
+### Fixed
+
+- [Fix SQLGetData not properly decreasing the number of remaining bytes left for variable-length data](https://github.com/awslabs/amazon-timestream-odbc-driver/pull/17).
+
 ## [v2.1.0](https://github.com/awslabs/amazon-timestream-odbc-driver/releases/tag/v2.1.0) - 2024-07-10
 
 ### Added

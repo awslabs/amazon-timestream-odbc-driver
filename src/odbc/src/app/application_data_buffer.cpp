@@ -283,7 +283,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
 
   if (inCharIndex >= value.length()) {
     if (resLenPtr) {
-      *resLenPtr = SQL_NO_TOTAL;
+      *resLenPtr = 0;
     }
     return ConversionResult::Type::AI_NO_DATA;
   }

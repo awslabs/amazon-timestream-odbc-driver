@@ -476,6 +476,11 @@ SqlResult::Type Connection::InternalSetAttribute(int attr, void* value,
       LOG_INFO_MSG("log level is set to " << static_cast< int >(type));
       break;
     }
+
+    case SQL_LOGIN_TIMEOUT: {
+      LOG_INFO_MSG("login timeout is not implemented yet and this value is ignored.");
+      break;
+    }
     default: {
       AddStatusRecord(SqlState::SHYC00_OPTIONAL_FEATURE_NOT_IMPLEMENTED,
                       "Specified attribute is not supported.");

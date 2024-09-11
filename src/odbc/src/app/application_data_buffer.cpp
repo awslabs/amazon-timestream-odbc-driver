@@ -282,8 +282,8 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlUlen inCharIndex = currentCellOffset / inCharSize;
 
   if (inCharIndex >= value.length()) {
-    if (resLenPtr) {
-      *resLenPtr = 0;
+    if (resLenPtr && value.length() != 0) {
+      *resLenPtr = SQL_NO_TOTAL;
     }
     return ConversionResult::Type::AI_NO_DATA;
   }

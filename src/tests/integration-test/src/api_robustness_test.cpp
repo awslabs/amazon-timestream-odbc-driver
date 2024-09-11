@@ -876,9 +876,6 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData) {
 }
 
 BOOST_AUTO_TEST_CASE(TestSQLGetDataEmpty) {
-  // There are no checks because we do not really care what is the result of
-  // these calls as long as they do not cause segmentation fault.
-
   ConnectToTS();
 
   std::vector< SQLWCHAR > sql =
@@ -898,8 +895,6 @@ BOOST_AUTO_TEST_CASE(TestSQLGetDataEmpty) {
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, sizeof(buffer), &resLen);
   // Empty response should set resLen to 0
   BOOST_CHECK(resLen == 0);
-
-  // stmt, colNum, targetType, targetValue, bufferLength, strLengthOrIndicator
 
   ret = SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, sizeof(buffer), &resLen);
   // Follow up calls to SQLGetData should return SQL_NO_DATA

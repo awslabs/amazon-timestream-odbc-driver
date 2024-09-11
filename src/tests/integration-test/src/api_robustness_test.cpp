@@ -875,6 +875,37 @@ BOOST_AUTO_TEST_CASE(TestSQLGetData) {
   SQLFetch(stmt);
 }
 
+BOOST_AUTO_TEST_CASE(TestSQLGetDataEmpty) {
+  // There are no checks because we do not really care what is the result of
+  // these calls as long as they do not cause segmentation fault.
+
+  ConnectToTS();
+
+  std::vector< SQLWCHAR > sql =
+      MakeSqlBuffer("select ''");
+
+  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  ret = SQLFetch(stmt);
+
+  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
+
+  SQLWCHAR buffer[ODBC_BUFFER_SIZE];
+  SQLLEN resLen = 0;
+
+  ret = SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, sizeof(buffer), &resLen);
+  // Empty response should set resLen to 0
+  BOOST_CHECK(resLen == 0);
+
+  // stmt, colNum, targetType, targetValue, bufferLength, strLengthOrIndicator
+
+  ret = SQLGetData(stmt, 1, SQL_C_WCHAR, buffer, sizeof(buffer), &resLen);
+  // Follow up calls to SQLGetData should return SQL_NO_DATA
+  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
+}
+
 BOOST_AUTO_TEST_CASE(TestSQLGetDataVarcharAsciiZeroBufferLength) {
   // Ensures that calling SQLGetData with a buffer length of zero
   // returns the required amount of data in the indicator pointer.

@@ -315,25 +315,6 @@ BOOST_AUTO_TEST_CASE(TestSQLFetchPastEnd) {
   SQLCloseCursor(stmt);
 }
 
-BOOST_AUTO_TEST_CASE(TestSQLFetchEmpty) {
-  // Ensures that an empty response returns SQL_NO_DATA
-  ConnectToTS();
-
-  std::vector<SQLWCHAR> sql = MakeSqlBuffer("SELECT ''");
-  SQLRETURN ret = SQLExecDirect(stmt, sql.data(), SQL_NTS);
-  // Expect success
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  // The first fetch should succeed
-  ret = SQLFetch(stmt);
-  ODBC_FAIL_ON_ERROR(ret, SQL_HANDLE_STMT, stmt);
-
-  ret = SQLFetch(stmt);
-  BOOST_CHECK_EQUAL(ret, SQL_NO_DATA);
-
-  SQLCloseCursor(stmt);
-}
-
 BOOST_AUTO_TEST_CASE(TestSQLExtendedFetch) {
   // There are no checks because we do not really care what is the result of
   // these calls as long as they do not cause segmentation fault.

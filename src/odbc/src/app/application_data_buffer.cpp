@@ -281,7 +281,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlUlen currentCellOffset = cellOffset >= 0 ? cellOffset : 0;
 
   // If all data has already been read, return AI_NO_DATA
-  if ((bytesRequired - ((currentCellOffset / inCharSize) * outCharSize)) <= 0) {
+  if (((currentCellOffset / inCharSize) * outCharSize) >= bytesRequired) {
     return ConversionResult::Type::AI_NO_DATA;
   }
   
@@ -310,20 +310,6 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     assert(false);
   }
 
-  if (isTruncated) {
-      if (resLenPtr) {
-        *resLenPtr = SQL_NO_TOTAL;
-      }
-      if ((currentCellOffset + buflen) < bytesRequired) {
-        SetCellOffset(currentCellOffset + (buflen / outCharSize));
-      } else {
-        SetCellOffset(currentCellOffset + ((buflen - inCharIndex) / outCharSize));
-      }
-      
-      return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
-  }
-
-
   written = static_cast< SqlLen >(bytesWritten);
   LOG_DEBUG_MSG("written is " << written);
 
@@ -336,16 +322,21 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     static_cast<SqlLen>(bytesRequired - totalBytesWritten) : bytesRequired;
   LOG_DEBUG_MSG("remainingBytesRequired is " << remainingBytesRequired);
 
+  if ((currentCellOffset + buflen) < bytesRequired) {
+    SetCellOffset(currentCellOffset + (buflen / outCharSize));
+  } else {
+    SetCellOffset(totalBytesWritten);
+  }
+
   if (resLenPtr) {
     *resLenPtr = remainingBytesRequired;
   }
-
-  if (cellOffset >= 0) {
-    size_t numCharsWritten = bytesWritten / outCharSize;
-    SetCellOffset(cellOffset + numCharsWritten * inCharSize);
+  
+  if (isTruncated) {
+      return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  } else {
+    return ConversionResult::Type::AI_SUCCESS;
   }
-
-  return ConversionResult::Type::AI_SUCCESS;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(

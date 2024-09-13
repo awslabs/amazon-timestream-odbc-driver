@@ -256,9 +256,10 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   LOG_DEBUG_MSG("inCharSize is " << inCharSize << ", outCharSize is "
                                  << outCharSize << ", buflen is " << buflen);
 
+  size_t valueLength = value.length();
   size_t bytesRequired = 0;
   if (ANSI_STRING_ONLY) {
-    bytesRequired = value.length() * outCharSize;
+    bytesRequired = valueLength * outCharSize;
   } else {
     thread_local std::wstring_convert<std::codecvt_utf8<wchar_t >, wchar_t>
       converter;
@@ -269,24 +270,23 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-  if (!dataPtr) {
-    // Provide the total bytes required for the field.
-    if (resLenPtr) {
-      *resLenPtr = bytesRequired;
-    }
-    return ConversionResult::Type::AI_SUCCESS;
-  }
+   if (!dataPtr) {
+     // Provide the total bytes required for the field.
+     if (resLenPtr) {
+       *resLenPtr = bytesRequired;
+     }
+     return ConversionResult::Type::AI_SUCCESS;
+   }
 
   SqlUlen currentCellOffset = cellOffset >= 0 ? cellOffset : 0;
-  // Since cellOffset is in bytes, an index needs to be calculated.
-  SqlUlen inCharIndex = currentCellOffset / inCharSize;
 
-  if (inCharIndex >= value.length()) {
-    if (resLenPtr && value.length() != 0) {
-      *resLenPtr = SQL_NO_TOTAL;
-    }
+  // If all data has already been read, return AI_NO_DATA
+  if ((bytesRequired - ((currentCellOffset / inCharSize) * outCharSize)) <= 0) {
     return ConversionResult::Type::AI_NO_DATA;
   }
+  
+  // Since cellOffset is in bytes, an index needs to be calculated.
+  SqlUlen inCharIndex = currentCellOffset / inCharSize;
 
   size_t bytesWritten = 0;
   bool isTruncated = false;
@@ -310,6 +310,20 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     assert(false);
   }
 
+  if (isTruncated) {
+      if (resLenPtr) {
+        *resLenPtr = SQL_NO_TOTAL;
+      }
+      if ((currentCellOffset + buflen) < bytesRequired) {
+        SetCellOffset(currentCellOffset + (buflen / outCharSize));
+      } else {
+        SetCellOffset(currentCellOffset + ((buflen - inCharIndex) / outCharSize));
+      }
+      
+      return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+  }
+
+
   written = static_cast< SqlLen >(bytesWritten);
   LOG_DEBUG_MSG("written is " << written);
 
@@ -331,11 +345,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     SetCellOffset(cellOffset + numCharsWritten * inCharSize);
   }
 
-  if (isTruncated) {
-    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
-  } else {
-    return ConversionResult::Type::AI_SUCCESS;
-  }
+  return ConversionResult::Type::AI_SUCCESS;
 }
 
 ConversionResult::Type ApplicationDataBuffer::PutRawDataToBuffer(

@@ -18,6 +18,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <codecvt>
 #include <ignite/common/include/common/decimal.h>
 #include <timestream/odbc/app/application_data_buffer.h>
 #include <timestream/odbc/system/odbc_constants.h>
@@ -1547,6 +1548,92 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
   BOOST_CHECK(res == "Hello with offset!");
   BOOST_CHECK(res.size() == strlen("Hello with offset!"));
   BOOST_CHECK(buf[1].reslen == strlen("Hello with offset!"));
+}
+
+BOOST_AUTO_TEST_CASE(TestSetLongString) {
+  char buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  std::string bigString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
+      Cras eget velit at eros pharetra tempus. Sed laoreet lorem nunc, a congue orci euismod vel. Cras molestie tellus vitae nisl pretium, a tristique magna \
+      tristique. In feugiat leo ac augue elementum facilisis. Pellentesque sollicitudin fringilla felis, id ornare mi lobortis a. Cras id eros vel nisi \
+      condimentum elementum sed eget tellus. Pellentesque commodo augue vitae diam suscipit dictum. Quisque vulputate a nulla dignissim semper. Cras rhoncus \
+      tortor sed ante maximus bibendum. Vivamus accumsan eros sem, vitae accumsan purus ornare quis. Cras eget quam at ipsum vestibulum laoreet. Nullam ut \
+      massa rhoncus, elementum velit nec, dignissim eros. Suspendisse potenti. Vivamus feugiat urna arcu, ut blandit dui molestie porttitor. Suspendisse mi \
+      risus, luctus vitae bibendum quis, ornare eget lacus. Maecenas rutrum sapien at interdum sagittis. Donec consectetur rutrum leo at ornare. Duis molestie \
+      diam ac diam imperdiet gravida. Ut sed tempus lorem. Vestibulum mattis quam mauris, non iaculis risus faucibus nec. Nullam congue volutpat gravida. \
+      Nullam vestibulum metus ultricies, consequat sem id, viverra velit. Sed eu diam eget purus rhoncus viverra ac et magna. Maecenas quis dignissim tortor, \
+      eu sodales ante. Maecenas rhoncus et massa eu suscipit. Sed pulvinar, sem vel viverra semper, dui risus ornare libero, vitae lacinia leo metus pharetra \
+      massa. Phasellus elementum efficitur nibh at blandit. Phasellus et auctor augue. Praesent quis facilisis orci. Orci varius natoque penatibus et magnis dis \
+      parturient montes, nascetur ridiculus mus. Nullam maximus ac mauris vel semper. Integer hendrerit bibendum nulla vitae blandit. Suspendisse in eleifend \
+      libero, ac semper est. Fusce non mattis lorem. Sed finibus leo egestas finibus euismod. Maecenas quis mauris vitae lacus efficitur mollis. Fusce faucibus \
+      fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
+
+  ConversionResult::Type ret = appBuf.PutString(bigString);
+  BOOST_CHECK(!bigString.substr(0, 1023).compare(buffer));
+  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(bigString);
+  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
+  BOOST_CHECK(!bigString.substr(1024, 1023).compare(buffer));
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(bigString);
+  BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
+  BOOST_CHECK_EQUAL(reslen, bigString.size());
+  ret = appBuf.PutString(bigString);
+  BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
+  SQLWCHAR buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  std::string bigString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
+      Cras eget velit at eros pharetra tempus. Sed laoreet lorem nunc, a congue orci euismod vel. Cras molestie tellus vitae nisl pretium, a tristique magna \
+      tristique. In feugiat leo ac augue elementum facilisis. Pellentesque sollicitudin fringilla felis, id ornare mi lobortis a. Cras id eros vel nisi \
+      condimentum elementum sed eget tellus. Pellentesque commodo augue vitae diam suscipit dictum. Quisque vulputate a nulla dignissim semper. Cras rhoncus \
+      tortor sed ante maximus bibendum. Vivamus accumsan eros sem, vitae accumsan purus ornare quis. Cras eget quam at ipsum vestibulum laoreet. Nullam ut \
+      massa rhoncus, elementum velit nec, dignissim eros. Suspendisse potenti. Vivamus feugiat urna arcu, ut blandit dui molestie porttitor. Suspendisse mi \
+      risus, luctus vitae bibendum quis, ornare eget lacus. Maecenas rutrum sapien at interdum sagittis. Donec consectetur rutrum leo at ornare. Duis molestie \
+      diam ac diam imperdiet gravida. Ut sed tempus lorem. Vestibulum mattis quam mauris, non iaculis risus faucibus nec. Nullam congue volutpat gravida. \
+      Nullam vestibulum metus ultricies, consequat sem id, viverra velit. Sed eu diam eget purus rhoncus viverra ac et magna. Maecenas quis dignissim tortor, \
+      eu sodales ante. Maecenas rhoncus et massa eu suscipit. Sed pulvinar, sem vel viverra semper, dui risus ornare libero, vitae lacinia leo metus pharetra \
+      massa. Phasellus elementum efficitur nibh at blandit. Phasellus et auctor augue. Praesent quis facilisis orci. Orci varius natoque penatibus et magnis dis \
+      parturient montes, nascetur ridiculus mus. Nullam maximus ac mauris vel semper. Integer hendrerit bibendum nulla vitae blandit. Suspendisse in eleifend \
+      libero, ac semper est. Fusce non mattis lorem. Sed finibus leo egestas finibus euismod. Maecenas quis mauris vitae lacus efficitur mollis. Fusce faucibus \
+      fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
+
+  ConversionResult::Type ret = appBuf.PutString(bigString);
+
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+  std::string converted_str = converter.to_bytes(buffer);
+
+  BOOST_CHECK(!bigString.substr(0, 1023).compare(converted_str));
+  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(bigString);
+  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
+
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter2;
+  converted_str = converter.to_bytes(buffer);
+
+  BOOST_CHECK(!bigString.substr(1024, 1023).compare(converted_str));
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(bigString);
+  BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
+  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), bigString.size());
+  ret = appBuf.PutString(bigString);
+  BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetDateFromString) {

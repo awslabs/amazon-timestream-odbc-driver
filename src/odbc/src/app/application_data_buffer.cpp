@@ -270,13 +270,13 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   SqlLen* resLenPtr = GetResLen();
   void* dataPtr = GetData();
 
-   if (!dataPtr) {
-     // Provide the total bytes required for the field.
-     if (resLenPtr) {
-       *resLenPtr = bytesRequired;
-     }
-     return ConversionResult::Type::AI_SUCCESS;
-   }
+  if (!dataPtr) {
+    // Provide the total bytes required for the field.
+    if (resLenPtr) {
+      *resLenPtr = bytesRequired;
+    }
+    return ConversionResult::Type::AI_SUCCESS;
+  }
 
   SqlUlen currentCellOffset = cellOffset >= 0 ? cellOffset : 0;
 

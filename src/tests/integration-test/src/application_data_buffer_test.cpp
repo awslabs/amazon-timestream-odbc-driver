@@ -1557,7 +1557,7 @@ BOOST_AUTO_TEST_CASE(TestSetLongString) {
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, buffer, sizeof(buffer),
                                &reslen);
 
-  std::string bigString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
+  std::string longString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
       Cras eget velit at eros pharetra tempus. Sed laoreet lorem nunc, a congue orci euismod vel. Cras molestie tellus vitae nisl pretium, a tristique magna \
       tristique. In feugiat leo ac augue elementum facilisis. Pellentesque sollicitudin fringilla felis, id ornare mi lobortis a. Cras id eros vel nisi \
       condimentum elementum sed eget tellus. Pellentesque commodo augue vitae diam suscipit dictum. Quisque vulputate a nulla dignissim semper. Cras rhoncus \
@@ -1572,20 +1572,22 @@ BOOST_AUTO_TEST_CASE(TestSetLongString) {
       libero, ac semper est. Fusce non mattis lorem. Sed finibus leo egestas finibus euismod. Maecenas quis mauris vitae lacus efficitur mollis. Fusce faucibus \
       fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
 
-  ConversionResult::Type ret = appBuf.PutString(bigString);
-  BOOST_CHECK(!bigString.substr(0, 1023).compare(buffer));
-  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
+  ConversionResult::Type ret = appBuf.PutString(longString);
+  BOOST_CHECK(!longString.substr(0, 1023).compare(buffer));
+  BOOST_CHECK_EQUAL(reslen, longString.size() - 1023);
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
-  ret = appBuf.PutString(bigString);
-  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
-  BOOST_CHECK(!bigString.substr(1024, 1023).compare(buffer));
+  ret = appBuf.PutString(longString);
+  BOOST_CHECK_EQUAL(reslen, longString.size() - 2047);
+  BOOST_CHECK(!longString.substr(1024, 1023).compare(buffer));
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
-  ret = appBuf.PutString(bigString);
+  ret = appBuf.PutString(longString);
   BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
-  BOOST_CHECK_EQUAL(reslen, bigString.size());
-  ret = appBuf.PutString(bigString);
+  BOOST_CHECK(!longString.substr(2048).compare(buffer));
+  BOOST_CHECK_EQUAL(reslen, 2080);
+
+  ret = appBuf.PutString(longString);
   BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);
 }
 
@@ -1596,7 +1598,7 @@ BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
   ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
                                &reslen);
 
-  std::string bigString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
+  std::string longString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
       Cras eget velit at eros pharetra tempus. Sed laoreet lorem nunc, a congue orci euismod vel. Cras molestie tellus vitae nisl pretium, a tristique magna \
       tristique. In feugiat leo ac augue elementum facilisis. Pellentesque sollicitudin fringilla felis, id ornare mi lobortis a. Cras id eros vel nisi \
       condimentum elementum sed eget tellus. Pellentesque commodo augue vitae diam suscipit dictum. Quisque vulputate a nulla dignissim semper. Cras rhoncus \
@@ -1611,28 +1613,29 @@ BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
       libero, ac semper est. Fusce non mattis lorem. Sed finibus leo egestas finibus euismod. Maecenas quis mauris vitae lacus efficitur mollis. Fusce faucibus \
       fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
 
-  ConversionResult::Type ret = appBuf.PutString(bigString);
-
+  ConversionResult::Type ret = appBuf.PutString(longString);
   std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
   std::string converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!bigString.substr(0, 1023).compare(converted_str));
-  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
+  BOOST_CHECK(!longString.substr(0, 1023).compare(converted_str));
+  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 1023);
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
-  ret = appBuf.PutString(bigString);
-  BOOST_CHECK_EQUAL(reslen, SQL_NO_TOTAL);
-
-  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter2;
+  ret = appBuf.PutString(longString);
   converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!bigString.substr(1024, 1023).compare(converted_str));
+  BOOST_CHECK(!longString.substr(1024, 1023).compare(converted_str));
+  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 2047);
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
-  ret = appBuf.PutString(bigString);
+  ret = appBuf.PutString(longString);
+  converted_str = converter.to_bytes(buffer);
+
+  BOOST_CHECK(!longString.substr(2048).compare(converted_str));
   BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
-  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), bigString.size());
-  ret = appBuf.PutString(bigString);
+  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size());
+
+  ret = appBuf.PutString(longString);
   BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);
 }
 

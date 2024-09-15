@@ -322,19 +322,17 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     static_cast<SqlLen>(bytesRequired - totalBytesWritten) : bytesRequired;
   LOG_DEBUG_MSG("remainingBytesRequired is " << remainingBytesRequired);
 
-  if ((currentCellOffset + buflen) < bytesRequired) {
-    SetCellOffset(currentCellOffset + (buflen / outCharSize));
-  } else {
-    SetCellOffset(totalBytesWritten);
-  }
-
   if (resLenPtr) {
     *resLenPtr = remainingBytesRequired;
   }
-  
+
   if (isTruncated) {
-      return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
+    SetCellOffset(currentCellOffset + (buflen / outCharSize));
+    return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
   } else {
+    if (cellOffset >= 0) {
+      SetCellOffset(totalBytesWritten);
+    }
     return ConversionResult::Type::AI_SUCCESS;
   }
 }

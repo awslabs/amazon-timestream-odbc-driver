@@ -256,10 +256,9 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   LOG_DEBUG_MSG("inCharSize is " << inCharSize << ", outCharSize is "
                                  << outCharSize << ", buflen is " << buflen);
 
-  size_t valueLength = value.length();
   size_t bytesRequired = 0;
   if (ANSI_STRING_ONLY) {
-    bytesRequired = valueLength * outCharSize;
+    bytesRequired = value.length() * outCharSize;
   } else {
     thread_local std::wstring_convert<std::codecvt_utf8<wchar_t >, wchar_t>
       converter;
@@ -278,26 +277,25 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     return ConversionResult::Type::AI_SUCCESS;
   }
 
+  // If cellOffset is not -1, we are on a continuation
   SqlUlen currentCellOffset = cellOffset >= 0 ? cellOffset : 0;
 
   // If all data has already been read, return AI_NO_DATA
-  if (((currentCellOffset / inCharSize) * outCharSize) >= bytesRequired) {
+  if ((currentCellOffset * outCharSize) >= bytesRequired) {
     return ConversionResult::Type::AI_NO_DATA;
   }
-  
-  // Since cellOffset is in bytes, an index needs to be calculated.
-  SqlUlen inCharIndex = currentCellOffset / inCharSize;
+
 
   size_t bytesWritten = 0;
   bool isTruncated = false;
   if (inCharSize == 1) {
     if (outCharSize == 2 || outCharSize == 4) {
       bytesWritten = utility::CopyUtf8StringToSqlWcharString(
-          reinterpret_cast< const char* >(value.c_str() + inCharIndex),
+          reinterpret_cast< const char* >(value.c_str() + currentCellOffset),
           reinterpret_cast< SQLWCHAR* >(dataPtr), buflen, isTruncated);
     } else if (sizeof(OutCharT) == 1) {
       bytesWritten = utility::CopyUtf8StringToSqlCharString(
-          reinterpret_cast< const char* >(value.c_str() + inCharIndex),
+          reinterpret_cast< const char* >(value.c_str() + currentCellOffset),
           reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
     } else {
       LOG_ERROR_MSG("Unexpected conversion from UTF8 string.");

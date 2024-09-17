@@ -38,7 +38,7 @@ cmake $SRC_DIR `
     -D ENABLE_RTTI="OFF" `
     -D ENABLE_TESTING="OFF" `
     -D CPP_STANDARD="17" `
-    -D AWS_SDK_WARNINGS_ARE_ERRORS="OFF"
+    -DAWS_SDK_WARNINGS_ARE_ERRORS="OFF"
 
 # Build AWS SDK and install to $INSTALL_DIR 
 $msbuild = &"${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1

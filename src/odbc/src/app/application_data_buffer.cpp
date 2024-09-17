@@ -325,7 +325,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   }
 
   if (isTruncated) {
-    SetCellOffset(currentCellOffset + (buflen / outCharSize));
+    SetCellOffset(currentCellOffset + ((buflen / outCharSize) - 1));
     return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
   } else {
     if (cellOffset >= 0) {

@@ -18,7 +18,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <codecvt>
 #include <ignite/common/include/common/decimal.h>
 #include <timestream/odbc/app/application_data_buffer.h>
 #include <timestream/odbc/system/odbc_constants.h>
@@ -1615,24 +1614,20 @@ BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
       fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
 
   ConversionResult::Type ret = appBuf.PutString(longString);
-  thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-  std::string converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!longString.substr(0, 1023).compare(converted_str));
+  BOOST_CHECK(!longString.substr(0, 1023).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
   BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 1023);
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
-  converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!longString.substr(1023, 1023).compare(converted_str));
+  BOOST_CHECK(!longString.substr(1023, 1023).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
   BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 2046);
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
-  converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!longString.substr(2046).compare(converted_str));
+  BOOST_CHECK(!longString.substr(2046).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
   BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
   BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size());
 

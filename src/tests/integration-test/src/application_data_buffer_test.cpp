@@ -1616,20 +1616,20 @@ BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
   ConversionResult::Type ret = appBuf.PutString(longString);
 
   BOOST_CHECK(!longString.substr(0, 1023).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
-  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 1023);
+  BOOST_CHECK_EQUAL(reslen, longString.size() - (1023 * sizeof(wchar_t)));
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
 
   BOOST_CHECK(!longString.substr(1023, 1023).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
-  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 2046);
+  BOOST_CHECK_EQUAL(reslen, longString.size() - (2046 * sizeof(wchar_t)));
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
 
   BOOST_CHECK(!longString.substr(2046).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
   BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
-  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size());
+  BOOST_CHECK_EQUAL(reslen, longString.size() / sizeof(wchar_t));
 
   ret = appBuf.PutString(longString);
   BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);

@@ -1550,6 +1550,7 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
   BOOST_CHECK(buf[1].reslen == strlen("Hello with offset!"));
 }
 
+
 BOOST_AUTO_TEST_CASE(TestSetLongString) {
   char buffer[1024];
   SqlLen reslen = 0;
@@ -1578,13 +1579,13 @@ BOOST_AUTO_TEST_CASE(TestSetLongString) {
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
-  BOOST_CHECK_EQUAL(reslen, longString.size() - 2047);
-  BOOST_CHECK(!longString.substr(1024, 1023).compare(buffer));
+  BOOST_CHECK_EQUAL(reslen, longString.size() - 2046);
+  BOOST_CHECK(!longString.substr(1023, 1023).compare(buffer));
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
   BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
-  BOOST_CHECK(!longString.substr(2048).compare(buffer));
+  BOOST_CHECK(!longString.substr(2046).compare(buffer));
   BOOST_CHECK_EQUAL(reslen, 2080);
 
   ret = appBuf.PutString(longString);
@@ -1624,14 +1625,14 @@ BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
   ret = appBuf.PutString(longString);
   converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!longString.substr(1024, 1023).compare(converted_str));
-  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 2047);
+  BOOST_CHECK(!longString.substr(1023, 1023).compare(converted_str));
+  BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size() - 2046);
   BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
 
   ret = appBuf.PutString(longString);
   converted_str = converter.to_bytes(buffer);
 
-  BOOST_CHECK(!longString.substr(2048).compare(converted_str));
+  BOOST_CHECK(!longString.substr(2046).compare(converted_str));
   BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
   BOOST_CHECK_EQUAL(reslen / sizeof(wchar_t), longString.size());
 

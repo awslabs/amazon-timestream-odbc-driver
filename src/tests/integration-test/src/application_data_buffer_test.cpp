@@ -1615,7 +1615,7 @@ BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
       fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
 
   ConversionResult::Type ret = appBuf.PutString(longString);
-  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+  thread_local std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
   std::string converted_str = converter.to_bytes(buffer);
 
   BOOST_CHECK(!longString.substr(0, 1023).compare(converted_str));

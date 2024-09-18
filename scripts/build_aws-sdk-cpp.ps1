@@ -29,6 +29,7 @@ Set-Location $BUILD_DIR
 
 # Configure and build 
 cmake -A $WIN_ARCH `
+    -D CMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations" `
     -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
     -D BUILD_ONLY="core;sts;timestream-query;timestream-write" `
@@ -42,5 +43,5 @@ cmake -A $WIN_ARCH `
 
 # Build AWS SDK and install to $INSTALL_DIR 
 $msbuild = &"${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1
-&$msbuild ALL_BUILD.vcxproj /m /p:Configuration=$CONFIGURATION -warnaserror -noerr:C4996 -noerr:C2220
-&$msbuild INSTALL.vcxproj /m /p:Configuration=$CONFIGURATION -warnaserror -noerr:C4996 -noerr:C2220
+&$msbuild ALL_BUILD.vcxproj /m /p:Configuration=$CONFIGURATION -warnaserror -noerr:C2220;C4996
+&$msbuild INSTALL.vcxproj /m /p:Configuration=$CONFIGURATION -warnaserror -noerr:C2220;C4996

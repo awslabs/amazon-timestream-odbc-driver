@@ -29,7 +29,7 @@ Set-Location $BUILD_DIR
 
 # Configure and build 
 cmake -A $WIN_ARCH `
-    -D CMAKE_CXX_FLAGS="/wd4996 /wd2220" `
+    -D CMAKE_CXX_FLAGS="/wd4996 /wd2220 /WX-" `
     -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
     -D BUILD_ONLY="core;sts;timestream-query;timestream-write" `

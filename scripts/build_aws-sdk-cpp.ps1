@@ -37,7 +37,7 @@ cmake -A $WIN_ARCH `
     -D ENABLE_RTTI="OFF" `
     -D ENABLE_TESTING="OFF" `
     -D CPP_STANDARD="17" `
-    -D AWS_SDK_WARNINGS_ARE_ERRORS="OFF" `
+    -DAWS_SDK_WARNINGS_ARE_ERRORS="OFF" `
     $SRC_DIR
 
 # Build AWS SDK and install to $INSTALL_DIR 

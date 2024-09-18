@@ -30,27 +30,23 @@ $BUILD_DIR = "${WORKING_DIR}\build"
 # $BUILD_DIR = "${WORKING_DIR}\build\${CONFIGURATION}${BITNESS}"
 New-Item -Path $BUILD_DIR -ItemType Directory -Force | Out-Null
 
-$SDK_SOURCE_DIR = "${WORKING_DIR}\src\aws-sdk-cpp"
-$SDK_BUILD_DIR = "${BUILD_DIR}\aws-sdk\build"
-$SDK_INSTALL_DIR = "${BUILD_DIR}\aws-sdk\install"
-
-.\scripts\build_aws-sdk-cpp.ps1 `
-    $CONFIGURATION $WIN_ARCH `
-    $SDK_SOURCE_DIR $SDK_BUILD_DIR $SDK_INSTALL_DIR
 Set-Location $CURRENT_DIR
 
 # Build driver
 $DRIVER_SOURCE_DIR = "${WORKING_DIR}\src"
 $DRIVER_BUILD_DIR = "${BUILD_DIR}\odbc\cmake"
-$DRIVER_BIN_DIR = "${BUILD_DIR}\odbc\bin\$CONFIGURATION"
+$VCPKG_INSTALLED_DIR = "${DRIVER_SOURCE_DIR}\vcpkg_installed\$env:VCPKG_DEFAULT_TRIPLET"
 
 .\scripts\build_driver.ps1 `
     $CONFIGURATION $WIN_ARCH `
-    $DRIVER_SOURCE_DIR $DRIVER_BUILD_DIR $DRIVER_BIN_DIR
+    $DRIVER_SOURCE_DIR $DRIVER_BUILD_DIR $VCPKG_INSTALLED_DIR
 Set-Location $CURRENT_DIR
 
 # Move driver dependencies to bin directory for testing
 New-Item -Path $DRIVER_BIN_DIR -ItemType Directory -Force | Out-Null
+
+# Copy over vcpkg dependencies
+Copy-Item $VCPKG_INSTALLED_DIR\bin\* $DRIVER_BIN_DIR
 
 if (Test-Path -Path $DRIVER_BUILD_DIR\$CONFIGURATION) {
     Copy-Item $DRIVER_BUILD_DIR\$CONFIGURATION\* $DRIVER_BIN_DIR -force -recurse

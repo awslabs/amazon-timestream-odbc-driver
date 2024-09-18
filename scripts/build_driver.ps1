@@ -15,7 +15,7 @@ $CONFIGURATION = $args[0]
 $WIN_ARCH = $args[1]
 $SRC_DIR = $args[2]
 $BUILD_DIR = $args[3]
-$INSTALL_DIR = $args[4]
+$VCPKG_INSTALL_DIR = $args[4]
 
 if ($WIN_ARCH -eq "x64") {
     $VCPKG_TARGET_TRIPLET="x64-windows"
@@ -33,7 +33,7 @@ cmake -S $SRC_DIR `
     -B $BUILD_DIR `
     -A $WIN_ARCH `
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
-    -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
+    -D CMAKE_INSTALL_PREFIX=$VCPKG_INSTALL_DIR `
     -D WITH_TESTS=ON `
     -D WITH_ODBC=ON `
     -D WITH_ODBC_MSI=ON `

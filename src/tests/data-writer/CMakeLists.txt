@@ -28,10 +28,10 @@ if (WIN32)
 
     # ensure our self-build aws sdk library could be found
     set_target_properties(aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query aws-cpp-sdk-timestream-write PROPERTIES
-      IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/../build/aws-sdk/install/bin
+      IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/bin
     )
     set_target_properties(AWS::aws-crt-cpp AWS::aws-c-cal AWS::aws-c-auth AWS::aws-c-common AWS::aws-c-io AWS::aws-checksums AWS::aws-c-event-stream AWS::aws-c-s3  AWS::aws-c-http AWS::aws-c-mqtt AWS::aws-c-compression AWS::aws-c-sdkutils PROPERTIES
-      IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/../build/aws-sdk/install/lib
+      IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib
     )
 
 else ()

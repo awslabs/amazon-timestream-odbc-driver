@@ -34,11 +34,11 @@ endif()
 
 # Windows
 if (WIN32)
-    set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/../build/aws-sdk/install/lib)
+    set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib)
 
     set(CMAKE_BUILD_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
-    set(AWS_DLL_DIR ${CMAKE_SOURCE_DIR}/../build/aws-sdk/install/bin)
-    set(AWS_LIB_DIR ${CMAKE_SOURCE_DIR}/../build/aws-sdk/install/lib)
+    set(AWS_DLL_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/bin)
+    set(AWS_LIB_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib)
 
     # copy AWS DLL to ${CMAKE_BUILD_DIR} as they are needed for Windows building and test running
     configure_file(${AWS_DLL_DIR}/aws-cpp-sdk-core.dll ${CMAKE_BUILD_DIR}/aws-cpp-sdk-core.dll COPYONLY)

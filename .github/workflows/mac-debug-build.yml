@@ -50,9 +50,9 @@ jobs:
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: cppcheck-results
+        name: cppcheck-results-macos64-debug
         path: cppcheck-results.log
 
     - name: get-dependencies
@@ -82,7 +82,7 @@ jobs:
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: upload-package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
         path: ./cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
@@ -128,9 +128,9 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: code-coverage
+        name: code-coverage-macos64-debug
         path: coverage.cobertura.xml
   
     - name: upload-integration-test-report
@@ -143,9 +143,9 @@ jobs:
 
     - name: upload-test-file
       if: always() && ((steps.runintegrationtests.outcome == 'failure') || (steps.rununittests.outcome == 'failure'))
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: odbc-test-results
+        name: odbc-test-results-macos64-debug
         path: |
           ./odbc_unit_test_result.xml
           ./odbc_test_result.xml
@@ -158,7 +158,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Retrieve coverage
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: code-coverage
 

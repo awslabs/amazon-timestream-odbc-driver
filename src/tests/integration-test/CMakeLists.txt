@@ -85,7 +85,7 @@ target_link_libraries(${TARGET} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} ${Boost_LIB
 
 if (WIN32)
     # ensure our self-build aws sdk library could be found
-    if (${BITNESS} EQUAL 64)
+    if (CMAKE_SIZEOF_VOID_P EQUAL 8)
       set_target_properties(aws-cpp-sdk-core aws-cpp-sdk-sts aws-cpp-sdk-timestream-query PROPERTIES
         IMPORTED_IMPLIB ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin
       )

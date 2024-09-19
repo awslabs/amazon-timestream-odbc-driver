@@ -52,7 +52,7 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: cppcheck-results
+        name: cppcheck-results-macos64-debug
         path: cppcheck-results.log
 
     - name: get-dependencies
@@ -130,7 +130,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: code-coverage
+        name: code-coverage-macos64-debug
         path: coverage.cobertura.xml
   
     - name: upload-integration-test-report
@@ -145,7 +145,7 @@ jobs:
       if: always() && ((steps.runintegrationtests.outcome == 'failure') || (steps.rununittests.outcome == 'failure'))
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-test-results
+        name: odbc-test-results-macos64-debug
         path: |
           ./odbc_unit_test_result.xml
           ./odbc_test_result.xml

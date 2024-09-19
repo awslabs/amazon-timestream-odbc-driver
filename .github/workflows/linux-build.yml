@@ -54,7 +54,7 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: cppcheck-results
+        name: cppcheck-results-linux64-release
         path: cppcheck-results.log
 
     - name: get-dependencies
@@ -111,7 +111,7 @@ jobs:
       if: always() && (steps.rununittests.outcome == 'failure')
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-unit-test-results
+        name: odbc-unit-test-results-linux64-release
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
@@ -135,7 +135,7 @@ jobs:
       if: always() && (steps.runodbctests.outcome == 'failure')
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-test-results
+        name: odbc-test-results-linux64-release
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
@@ -162,7 +162,7 @@ jobs:
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: cppcheck-results
+        name: cppcheck-results-linux64-debug
         path: cppcheck-results.log
 
     - name: get-dependencies
@@ -219,7 +219,7 @@ jobs:
       if: always() && (steps.rununittests.outcome == 'failure')
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-unit-test-results-linux-debug
+        name: odbc-unit-test-results-linux64-debug
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
@@ -266,7 +266,7 @@ jobs:
       if: always() && (steps.runodbctests.outcome == 'failure')
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-test-results-linux-debug
+        name: odbc-test-results-linux64-debug
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 

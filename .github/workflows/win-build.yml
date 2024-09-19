@@ -111,7 +111,7 @@ jobs:
     - name: Upload ODBC connector build 
       uses: actions/upload-artifact@v4
       with:
-        name: AmazonTimestreamConnector.mez
+        name: AmazonTimestreamConnector-win32-release.mez
         path: ./src/PowerBIConnector/AmazonTimestreamConnector.mez
 
     - name: register-driver
@@ -144,7 +144,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-unit-test-results
+        name: odbc-unit-test-results-win32-release
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log
@@ -166,7 +166,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-test-results
+        name: odbc-test-results-win32-release
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log
@@ -252,7 +252,7 @@ jobs:
     - name: Upload ODBC connector build 
       uses: actions/upload-artifact@v4
       with:
-        name: AmazonTimestreamConnector.mez
+        name: AmazonTimestreamConnector-win64-release.mez
         path: ./src/PowerBIConnector/AmazonTimestreamConnector.mez
 
     - name: register-driver
@@ -285,7 +285,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-unit-test-results
+        name: odbc-unit-test-results-win64-release
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log
@@ -307,7 +307,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: odbc-test-results
+        name: odbc-test-results-win64-release
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log

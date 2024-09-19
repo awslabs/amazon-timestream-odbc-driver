@@ -1549,6 +1549,92 @@ BOOST_AUTO_TEST_CASE(TestSetStringWithOffset) {
   BOOST_CHECK(buf[1].reslen == strlen("Hello with offset!"));
 }
 
+
+BOOST_AUTO_TEST_CASE(TestSetLongString) {
+  char buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_CHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  std::string longString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
+      Cras eget velit at eros pharetra tempus. Sed laoreet lorem nunc, a congue orci euismod vel. Cras molestie tellus vitae nisl pretium, a tristique magna \
+      tristique. In feugiat leo ac augue elementum facilisis. Pellentesque sollicitudin fringilla felis, id ornare mi lobortis a. Cras id eros vel nisi \
+      condimentum elementum sed eget tellus. Pellentesque commodo augue vitae diam suscipit dictum. Quisque vulputate a nulla dignissim semper. Cras rhoncus \
+      tortor sed ante maximus bibendum. Vivamus accumsan eros sem, vitae accumsan purus ornare quis. Cras eget quam at ipsum vestibulum laoreet. Nullam ut \
+      massa rhoncus, elementum velit nec, dignissim eros. Suspendisse potenti. Vivamus feugiat urna arcu, ut blandit dui molestie porttitor. Suspendisse mi \
+      risus, luctus vitae bibendum quis, ornare eget lacus. Maecenas rutrum sapien at interdum sagittis. Donec consectetur rutrum leo at ornare. Duis molestie \
+      diam ac diam imperdiet gravida. Ut sed tempus lorem. Vestibulum mattis quam mauris, non iaculis risus faucibus nec. Nullam congue volutpat gravida. \
+      Nullam vestibulum metus ultricies, consequat sem id, viverra velit. Sed eu diam eget purus rhoncus viverra ac et magna. Maecenas quis dignissim tortor, \
+      eu sodales ante. Maecenas rhoncus et massa eu suscipit. Sed pulvinar, sem vel viverra semper, dui risus ornare libero, vitae lacinia leo metus pharetra \
+      massa. Phasellus elementum efficitur nibh at blandit. Phasellus et auctor augue. Praesent quis facilisis orci. Orci varius natoque penatibus et magnis dis \
+      parturient montes, nascetur ridiculus mus. Nullam maximus ac mauris vel semper. Integer hendrerit bibendum nulla vitae blandit. Suspendisse in eleifend \
+      libero, ac semper est. Fusce non mattis lorem. Sed finibus leo egestas finibus euismod. Maecenas quis mauris vitae lacus efficitur mollis. Fusce faucibus \
+      fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
+
+  ConversionResult::Type ret = appBuf.PutString(longString);
+  BOOST_CHECK(!longString.substr(0, 1023).compare(buffer));
+  BOOST_CHECK_EQUAL(reslen, longString.size() - 1023);
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(longString);
+  BOOST_CHECK_EQUAL(reslen, longString.size() - 2046);
+  BOOST_CHECK(!longString.substr(1023, 1023).compare(buffer));
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(longString);
+  BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
+  BOOST_CHECK(!longString.substr(2046).compare(buffer));
+  BOOST_CHECK_EQUAL(reslen, 2080);
+
+  ret = appBuf.PutString(longString);
+  BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestSetLongStringWchar) {
+  SQLWCHAR buffer[1024];
+  SqlLen reslen = 0;
+
+  ApplicationDataBuffer appBuf(OdbcNativeType::AI_WCHAR, buffer, sizeof(buffer),
+                               &reslen);
+
+  std::string longString("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus cursus urna in nibh congue, at semper sapien efficitur. \
+      Cras eget velit at eros pharetra tempus. Sed laoreet lorem nunc, a congue orci euismod vel. Cras molestie tellus vitae nisl pretium, a tristique magna \
+      tristique. In feugiat leo ac augue elementum facilisis. Pellentesque sollicitudin fringilla felis, id ornare mi lobortis a. Cras id eros vel nisi \
+      condimentum elementum sed eget tellus. Pellentesque commodo augue vitae diam suscipit dictum. Quisque vulputate a nulla dignissim semper. Cras rhoncus \
+      tortor sed ante maximus bibendum. Vivamus accumsan eros sem, vitae accumsan purus ornare quis. Cras eget quam at ipsum vestibulum laoreet. Nullam ut \
+      massa rhoncus, elementum velit nec, dignissim eros. Suspendisse potenti. Vivamus feugiat urna arcu, ut blandit dui molestie porttitor. Suspendisse mi \
+      risus, luctus vitae bibendum quis, ornare eget lacus. Maecenas rutrum sapien at interdum sagittis. Donec consectetur rutrum leo at ornare. Duis molestie \
+      diam ac diam imperdiet gravida. Ut sed tempus lorem. Vestibulum mattis quam mauris, non iaculis risus faucibus nec. Nullam congue volutpat gravida. \
+      Nullam vestibulum metus ultricies, consequat sem id, viverra velit. Sed eu diam eget purus rhoncus viverra ac et magna. Maecenas quis dignissim tortor, \
+      eu sodales ante. Maecenas rhoncus et massa eu suscipit. Sed pulvinar, sem vel viverra semper, dui risus ornare libero, vitae lacinia leo metus pharetra \
+      massa. Phasellus elementum efficitur nibh at blandit. Phasellus et auctor augue. Praesent quis facilisis orci. Orci varius natoque penatibus et magnis dis \
+      parturient montes, nascetur ridiculus mus. Nullam maximus ac mauris vel semper. Integer hendrerit bibendum nulla vitae blandit. Suspendisse in eleifend \
+      libero, ac semper est. Fusce non mattis lorem. Sed finibus leo egestas finibus euismod. Maecenas quis mauris vitae lacus efficitur mollis. Fusce faucibus \
+      fermentum mauris, vitae vestibulum ligula aliquam in. Proin ut eu.");
+
+  ConversionResult::Type ret = appBuf.PutString(longString);
+
+  BOOST_CHECK(!longString.substr(0, 1023).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
+  BOOST_CHECK_EQUAL(reslen, (longString.size() - 1023) * sizeof(SQLWCHAR));
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(longString);
+
+  BOOST_CHECK(!longString.substr(1023, 1023).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
+  BOOST_CHECK_EQUAL(reslen, (longString.size() - 2046) * sizeof(SQLWCHAR));
+  BOOST_CHECK(ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED == ret);
+
+  ret = appBuf.PutString(longString);
+
+  BOOST_CHECK(!longString.substr(2046).compare(timestream::odbc::utility::SqlWcharToString(buffer, SQL_NTS)));
+  BOOST_CHECK(ConversionResult::Type::AI_SUCCESS == ret);
+  BOOST_CHECK_EQUAL(reslen, longString.size() * sizeof(SQLWCHAR));
+
+  ret = appBuf.PutString(longString);
+  BOOST_CHECK(ConversionResult::Type::AI_NO_DATA == ret);
+}
+
 BOOST_AUTO_TEST_CASE(TestGetDateFromString) {
   char buf[] = "1999-02-22";
   SqlLen reslen = sizeof(buf);

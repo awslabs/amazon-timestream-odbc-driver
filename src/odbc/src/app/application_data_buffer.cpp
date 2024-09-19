@@ -277,27 +277,25 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     return ConversionResult::Type::AI_SUCCESS;
   }
 
+  // If cellOffset is not -1, we are on a continuation
   SqlUlen currentCellOffset = cellOffset >= 0 ? cellOffset : 0;
-  // Since cellOffset is in bytes, an index needs to be calculated.
-  SqlUlen inCharIndex = currentCellOffset / inCharSize;
 
-  if (inCharIndex >= value.length()) {
-    if (resLenPtr) {
-      *resLenPtr = SQL_NO_TOTAL;
-    }
+  // If all data has already been read, return AI_NO_DATA
+  if ((currentCellOffset * outCharSize) >= bytesRequired) {
     return ConversionResult::Type::AI_NO_DATA;
   }
+
 
   size_t bytesWritten = 0;
   bool isTruncated = false;
   if (inCharSize == 1) {
     if (outCharSize == 2 || outCharSize == 4) {
       bytesWritten = utility::CopyUtf8StringToSqlWcharString(
-          reinterpret_cast< const char* >(value.c_str() + inCharIndex),
+          reinterpret_cast< const char* >(value.c_str() + currentCellOffset),
           reinterpret_cast< SQLWCHAR* >(dataPtr), buflen, isTruncated);
     } else if (sizeof(OutCharT) == 1) {
       bytesWritten = utility::CopyUtf8StringToSqlCharString(
-          reinterpret_cast< const char* >(value.c_str() + inCharIndex),
+          reinterpret_cast< const char* >(value.c_str() + currentCellOffset),
           reinterpret_cast< SQLCHAR* >(dataPtr), buflen, isTruncated);
     } else {
       LOG_ERROR_MSG("Unexpected conversion from UTF8 string.");
@@ -326,14 +324,13 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
     *resLenPtr = remainingBytesRequired;
   }
 
-  if (cellOffset >= 0) {
-    size_t numCharsWritten = bytesWritten / outCharSize;
-    SetCellOffset(cellOffset + numCharsWritten * inCharSize);
-  }
-
   if (isTruncated) {
+    SetCellOffset(currentCellOffset + ((buflen / outCharSize) - 1));
     return ConversionResult::Type::AI_VARLEN_DATA_TRUNCATED;
   } else {
+    if (cellOffset >= 0) {
+      SetCellOffset(totalBytesWritten);
+    }
     return ConversionResult::Type::AI_SUCCESS;
   }
 }

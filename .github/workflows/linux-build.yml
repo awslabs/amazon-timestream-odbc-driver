@@ -52,7 +52,7 @@ jobs:
   
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: cppcheck-results-linux64-release
         path: cppcheck-results.log
@@ -73,7 +73,7 @@ jobs:
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: upload-package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_RELEASE_amd64
         path: cmake-build64/AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_RELEASE_amd64.deb
@@ -109,7 +109,7 @@ jobs:
 
     - name: upload-odbc-unit-test-file
       if: always() && (steps.rununittests.outcome == 'failure')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-unit-test-results-linux64-release
         path: |
@@ -133,7 +133,7 @@ jobs:
 
     - name: upload-odbc-test-file
       if: always() && (steps.runodbctests.outcome == 'failure')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-test-results-linux64-release
         path: |
@@ -160,7 +160,7 @@ jobs:
   
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: cppcheck-results-linux64-debug
         path: cppcheck-results.log
@@ -181,7 +181,7 @@ jobs:
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: upload-package
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_DEBUG_amd64
         path: cmake-build64/AmazonTimestreamODBC_${{env.ODBC_DRIVER_VERSION}}_DEBUG_amd64.deb
@@ -217,7 +217,7 @@ jobs:
 
     - name: upload-unit-test-file
       if: always() && (steps.rununittests.outcome == 'failure')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-unit-test-results-linux64-debug
         path: |
@@ -264,7 +264,7 @@ jobs:
 
     - name: upload-odbc-test-file
       if: always() && (steps.runodbctests.outcome == 'failure')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-test-results-linux64-debug
         path: |
@@ -274,7 +274,7 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: code-coverage-Linux
         path: cmake-build64/ccov/all-merged

@@ -109,7 +109,7 @@ jobs:
         cd ${{github.workspace}}
 
     - name: Upload ODBC connector build 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AmazonTimestreamConnector-win32-release.mez
         path: ./src/PowerBIConnector/AmazonTimestreamConnector.mez
@@ -142,7 +142,7 @@ jobs:
 
     - name: upload-unit-test-file
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-unit-test-results-win32-release
         path: |
@@ -164,7 +164,7 @@ jobs:
 
     - name: upload-integration-test-file
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-test-results-win32-release
         path: |
@@ -199,7 +199,7 @@ jobs:
         Invoke-SignInstaller build\odbc\cmake\Release x86 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
 
     - name: Upload ODBC driver build 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: timestream-odbc-driver-32
         path: build/odbc/cmake/Release
@@ -250,7 +250,7 @@ jobs:
         cd ${{github.workspace}}
 
     - name: Upload ODBC connector build 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: AmazonTimestreamConnector-win64-release.mez
         path: ./src/PowerBIConnector/AmazonTimestreamConnector.mez
@@ -283,7 +283,7 @@ jobs:
 
     - name: upload-unit-test-file
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-unit-test-results-win64-release
         path: |
@@ -305,7 +305,7 @@ jobs:
 
     - name: upload-integration-test-file
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: odbc-test-results-win64-release
         path: |
@@ -340,7 +340,7 @@ jobs:
         Invoke-SignInstaller build\odbc\cmake\Release x64 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
 
     - name: Upload ODBC driver build 
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: timestream-odbc-driver-64
         path: build/odbc/cmake/Release
@@ -417,7 +417,7 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: code-coverage
         path: coverage.cobertura.xml

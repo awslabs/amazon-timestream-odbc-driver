@@ -28,8 +28,8 @@ New-Item -Path $BUILD_DIR -ItemType Directory -Force | Out-Null
 Set-Location $BUILD_DIR
 
 # Configure and build 
-cmake -A $WIN_ARCH `
-    -D CMAKE_CXX_FLAGS="/wd4996 /wd2220 /WX-" `
+cmake $SRC_DIR `
+    -A $WIN_ARCH `
     -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR `
     -D CMAKE_BUILD_TYPE=$CONFIGURATION `
     -D BUILD_ONLY="core;sts;timestream-query;timestream-write" `
@@ -37,9 +37,7 @@ cmake -A $WIN_ARCH `
     -D CUSTOM_MEMORY_MANAGEMENT="OFF" `
     -D ENABLE_RTTI="OFF" `
     -D ENABLE_TESTING="OFF" `
-    -D CPP_STANDARD="17" `
-    -DAWS_SDK_WARNINGS_ARE_ERRORS="OFF" `
-    $SRC_DIR
+    -D CPP_STANDARD="17"
 
 # Build AWS SDK and install to $INSTALL_DIR 
 $msbuild = &"${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe | select-object -first 1

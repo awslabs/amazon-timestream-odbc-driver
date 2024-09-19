@@ -50,7 +50,7 @@ jobs:
         sh run_cppcheck.sh
     - name: upload-cppcheck-results
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: cppcheck-results-macos64-debug
         path: cppcheck-results.log
@@ -82,7 +82,7 @@ jobs:
         echo "ODBC_DRIVER_VERSION=$ODBC_DRIVER_VERSION" >> $GITHUB_ENV
 
     - name: upload-package
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
         path: ./cmake-build64/AmazonTimestreamODBC-${{env.ODBC_DRIVER_VERSION}}.pkg
@@ -128,7 +128,7 @@ jobs:
 
     - name: upload-coverage
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: code-coverage-macos64-debug
         path: coverage.cobertura.xml
@@ -143,7 +143,7 @@ jobs:
 
     - name: upload-test-file
       if: always() && ((steps.runintegrationtests.outcome == 'failure') || (steps.rununittests.outcome == 'failure'))
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
         name: odbc-test-results-macos64-debug
         path: |

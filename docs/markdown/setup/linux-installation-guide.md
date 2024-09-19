@@ -37,22 +37,22 @@ sudo yum install unixODBC
 
     #### Sample command for Debian 64 bit 
     ```
-    sudo dpkg -i AmazonTimestreamODBC_2.1.1_RELEASE_amd64.deb
+    sudo dpkg -i AmazonTimestreamODBC_2.1.2_RELEASE_amd64.deb
     ```
 
     #### Sample command for Debian 32 bit 
     ```
-    sudo dpkg -i AmazonTimestreamODBC_2.1.1_RELEASE_i386.deb
+    sudo dpkg -i AmazonTimestreamODBC_2.1.2_RELEASE_i386.deb
     ```
 
     #### Sample command for RPM based 64 bit
     ```
-    sudo rpm -i AmazonTimestreamODBC_2.1.1_RELEASE_x86_64.rpm
+    sudo rpm -i AmazonTimestreamODBC_2.1.2_RELEASE_x86_64.rpm
     ```
 
     #### Sample command for RPM based 32 bit
     ```
-    sudo rpm -i AmazonTimestreamODBC_2.1.1_RELEASE_i386.rpm
+    sudo rpm -i AmazonTimestreamODBC_2.1.2_RELEASE_i386.rpm
     ```
 
 3. Register the ODBC driver by running the following script.
@@ -76,32 +76,32 @@ There is no automatical way to uninstall it. It has to be done manually.
 
     #### Command for RPM based 64 bit
     ```
-    sudo zypper remove amazontimestreamodbc_2.1.1_release_x86_64
+    sudo zypper remove amazontimestreamodbc_2.1.2_release_x86_64
     ```
     or
 
     ```
-    sudo yum remove amazontimestreamodbc_2.1.1_release_x86_64
+    sudo yum remove amazontimestreamodbc_2.1.2_release_x86_64
     ```
 
     #### Command for RPM based 32 bit
     ```
-    sudo zypper remove amazontimestreamodbc_2.1.1_release_i386
+    sudo zypper remove amazontimestreamodbc_2.1.2_release_i386
     ```
     or
 
     ```
-    sudo yum remove amazontimestreamodbc_2.1.1_release_i386
+    sudo yum remove amazontimestreamodbc_2.1.2_release_i386
     ```
 
     #### Command for Debian 64 bit
     ```
-    sudo apt remove amazontimestreamodbc_2.1.1_release_amd64
+    sudo apt remove amazontimestreamodbc_2.1.2_release_amd64
     ```
 
     #### Command for Debian 32 bit
     ```
-    sudo apt remove amazontimestreamodbc_2.1.1_release_i386
+    sudo apt remove amazontimestreamodbc_2.1.2_release_i386
     ```
 
 2. If "Amazon Timestream ODBC Driver" entry still exists in /etc/odbcinst.ini or /etc/unixODBC/odbcinst.ini, remove it.

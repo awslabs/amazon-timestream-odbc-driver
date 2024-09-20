@@ -203,7 +203,7 @@ jobs:
       run: |
         . ./scripts/sign_installer.ps1
         choco install jq -y
-        Invoke-SignInstaller build\odbc\cmake\Release x86 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_SIGNING_SECRET_ACCESS_KEY }}
+        Invoke-SignInstaller build\odbc\cmake\Release x86 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
 
     - name: Upload ODBC driver build 
       uses: actions/upload-artifact@v4
@@ -344,7 +344,7 @@ jobs:
       run: |
         . ./scripts/sign_installer.ps1
         choco install jq -y
-        Invoke-SignInstaller build\odbc\cmake\Release x64 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_SIGNING_SECRET_ACCESS_KEY }}
+        Invoke-SignInstaller build\odbc\cmake\Release x64 ${{ steps.getversion.outputs.version }} ${{ secrets.AWS_UNSIGNED_BUCKET }} ${{ secrets.AWS_SIGNED_BUCKET }} ${{ secrets.AWS_KEY }}
 
     - name: Upload ODBC driver build 
       uses: actions/upload-artifact@v4

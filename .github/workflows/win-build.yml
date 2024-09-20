@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       sign:
-        description: 'Whether to sign the installers'
+        description: 'Sign installers'
         required: true
         default: true
         type: boolean
@@ -58,8 +58,8 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
+          base: ""
+          head: ${{ github.ref_name }}
           extra_args: --debug --only-verified
       - name: git secrets
         run: |

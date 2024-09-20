@@ -129,8 +129,8 @@ jobs:
       if: success()
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -188,11 +188,11 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v2
       with:
         role-skip-session-tagging: true
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_SIGNING_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SIGNING_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
-        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-to-assume: ${{ secrets.AWS_SIGNING_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_SIGNING_ROLE_EXTERNAL_ID }}
         role-duration-seconds: 3600
 
     # Name of signed executable is same as unsigned exeuctable
@@ -270,8 +270,8 @@ jobs:
       if: success()
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -329,11 +329,11 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v2
       with:
         role-skip-session-tagging: true
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_SIGNING_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SIGNING_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
-        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-        role-external-id: ${{ secrets.AWS_ROLE_EXTERNAL_ID }}
+        role-to-assume: ${{ secrets.AWS_SIGNING_ROLE_TO_ASSUME }}
+        role-external-id: ${{ secrets.AWS_SIGNING_ROLE_EXTERNAL_ID }}
         role-duration-seconds: 3600
 
     # Name of signed executable is same as unsigned exeuctable
@@ -411,8 +411,8 @@ jobs:
       if: success()
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
 
     - name: run-tests

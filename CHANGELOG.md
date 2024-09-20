@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v2.1.2](https://github.com/awslabs/amazon-timestream-odbc-driver/releases/tag/v2.1.2) - 2024-09-19
 
+### Added
+
+- [Add workflow dispatch trigger for Windows GitHub action](https://github.com/awslabs/amazon-timestream-odbc-driver/pull/25).
+
 ### Fixed
 
 - [Fix aws-sdk-cpp Dependency for Windows Builds](https://github.com/awslabs/amazon-timestream-odbc-driver/pull/23).

@@ -1,6 +1,13 @@
 name: ODBC Driver for Windows
 
 on:
+  workflow_dispatch:
+    inputs:
+      sign:
+        description: 'Whether to sign the installers'
+        required: true
+        default: true
+        type: boolean
   push:
     branches:
       - main

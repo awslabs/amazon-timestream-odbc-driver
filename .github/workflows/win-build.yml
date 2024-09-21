@@ -105,6 +105,13 @@ jobs:
       env:
         VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
 
+    - name: Read ODBC_DRIVER_VERSION file
+      shell: bash
+      id: getversion
+      run: |
+        cat src/ODBC_DRIVER_VERSION.txt
+        echo "version=$(cat src/ODBC_DRIVER_VERSION.txt)" >> "$GITHUB_OUTPUT"
+
     - name: configure-and-build-driver
       run: |
         .\build_win_release32.ps1
@@ -178,11 +185,6 @@ jobs:
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log
 
-    - name: Read VERSION file
-      if: ${{ env.SIGNING_ENABLED == 'true' }}
-      id: getversion
-      run: echo "version=$(cat src/ODBC_DRIVER_VERSION.txt)" >> "$GITHUB_OUTPUT"
-
     - name: "Configure AWS credentials"
       if: ${{ env.SIGNING_ENABLED == 'true' }}
       uses: aws-actions/configure-aws-credentials@v2
@@ -245,6 +247,13 @@ jobs:
       run: vcpkg integrate install; vcpkg install boost-test:x64-windows boost-asio:x64-windows boost-chrono:x64-windows boost-interprocess:x64-windows boost-regex:x64-windows boost-system:x64-windows boost-thread:x64-windows --recurse
       env:
         VCPKG_ROOT: ${{env.VCPKG_ROOT}}
+
+    - name: Read ODBC_DRIVER_VERSION file
+      shell: bash
+      id: getversion
+      run: |
+        cat src/ODBC_DRIVER_VERSION.txt
+        echo "version=$(cat src/ODBC_DRIVER_VERSION.txt)" >> "$GITHUB_OUTPUT"
 
     - name: configure-and-build-driver
       run: |
@@ -318,11 +327,6 @@ jobs:
         path: |
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log
-
-    - name: Read VERSION file
-      if: ${{ env.SIGNING_ENABLED == 'true' }}
-      id: getversion
-      run: echo "version=$(cat src/ODBC_DRIVER_VERSION.txt)" >> "$GITHUB_OUTPUT"
 
     - name: "Configure AWS credentials"
       if: ${{ env.SIGNING_ENABLED == 'true' }}

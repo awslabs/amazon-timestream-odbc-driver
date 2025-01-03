@@ -30,7 +30,7 @@ message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
 find_package(ODBC REQUIRED)
 find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query)
-find_package(Boost REQUIRED)
+find_package(Boost CONFIG REQUIRED)
 if (UNIX)
     find_package(ZLIB REQUIRED)
 endif()

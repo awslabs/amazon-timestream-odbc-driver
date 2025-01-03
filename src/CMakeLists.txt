@@ -21,6 +21,7 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 # Mac
 if (UNIX AND APPLE)
     set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+    include_directories(/usr/local/iODBC/include)
 endif()
 
 # Linux 

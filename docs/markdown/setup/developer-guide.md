@@ -94,6 +94,8 @@ Driver installer detects existing driver and isn't allowing installation
    2. `brew install libiodbc`  
       - You may need to unlink `unixodbc` if you already have this installed. Use `brew unlink unixodbc`.
       - You may need to run `brew link --overwrite --force libiodbc`.
+      - ln -s /opt/homebrew/opt/llvm/bin/llvm-cov /usr/local/bin/llvm-cov
+      - ln -s /usr/local/iODBC/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
    3. `brew install boost`
    4. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
       - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
@@ -115,7 +117,7 @@ have all been set correctly:
 - `AWS_ACCESS_KEY_ID` (from prerequisites)
 - `AWS_SECRET_ACCESS_KEY` (from prerequisites)
 - `ODBCINSTINI`
-- `DYLD_LIBRARY`
+- `DYLD_LIBRARY_PATH`
 
 ## Linux
 

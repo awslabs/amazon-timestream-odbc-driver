@@ -19,7 +19,7 @@ if (WIN32)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
 
-find_package(Boost CONFIG REQUIRED COMPONENTS unit_test_framework chrono thread system regex)
+find_package(Boost 1.81 REQUIRED COMPONENTS unit_test_framework chrono thread system regex)
 
 find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query)
 if (UNIX)

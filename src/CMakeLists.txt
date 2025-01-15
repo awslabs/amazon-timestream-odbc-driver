@@ -20,7 +20,7 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 
 # Mac
 if (UNIX AND APPLE)
-    set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+  include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-osx/include) # TODO: Fix TMP
     include_directories(/usr/local/iODBC/include)
 endif()
 
@@ -65,27 +65,6 @@ if (WIN32)
     configure_file(${AWS_DLL_DIR}/aws-c-s3.dll ${CMAKE_BUILD_DIR}/aws-c-s3.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-c-sdkutils.dll ${CMAKE_BUILD_DIR}/aws-c-sdkutils.dll COPYONLY)
 endif()
-
-# ensure AWS SDK libraries built by us could be found by find_package
-set(s2n_DIR "${AWS_CMAKE_DIR}/s2n/cmake")
-set(aws-cpp-sdk-timestream-query_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-query")
-# Timestream-write directory value is needed for data writer tool
-set(aws-cpp-sdk-timestream-write_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-write")
-set(aws-cpp-sdk-sts_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-sts")
-set(aws-cpp-sdk-core_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-core")
-set(aws-crt-cpp_DIR "${AWS_CMAKE_DIR}/aws-crt-cpp/cmake")
-set(aws-c-http_DIR "${AWS_CMAKE_DIR}/aws-c-http/cmake")
-set(aws-c-io_DIR "${AWS_CMAKE_DIR}/aws-c-io/cmake")
-set(aws-c-common_DIR "${AWS_CMAKE_DIR}/aws-c-common/cmake")
-set(aws-c-cal_DIR "${AWS_CMAKE_DIR}/aws-c-cal/cmake")
-set(aws-c-compression_DIR "${AWS_CMAKE_DIR}/aws-c-compression/cmake")
-set(aws-c-auth_DIR "${AWS_CMAKE_DIR}/aws-c-auth/cmake")
-set(aws-c-mqtt_DIR "${AWS_CMAKE_DIR}/aws-c-mqtt/cmake")
-set(aws-checksums_DIR "${AWS_CMAKE_DIR}/aws-checksums/cmake")
-set(aws-c-event-stream_DIR "${AWS_CMAKE_DIR}/aws-c-event-stream/cmake")
-set(aws-c-s3_DIR "${AWS_CMAKE_DIR}/aws-c-s3/cmake")
-set(aws-c-sdkutils_DIR "${AWS_CMAKE_DIR}/aws-c-sdkutils/cmake")
-set(AWSSDK_DIR "${AWS_CMAKE_DIR}/cmake/AWSSDK")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")

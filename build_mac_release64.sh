@@ -16,10 +16,10 @@ vcpkg install
 vcpkg integrate install
 cd ..
 
-VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
-if [[ $MACHTYPE == 'arm64-apple-darwin'* ]]; then
-  VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
-fi
+#VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
+#if [[ $MACHTYPE == 'x86_64'* ]]; then
+VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
+#fi
 
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Release

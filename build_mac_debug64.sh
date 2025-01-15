@@ -13,13 +13,13 @@
 
 cd src
 vcpkg install
-vcpkg integrate install
+#vcpkg integrate install
 cd ..
 
-VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
-if [[ $MACHTYPE == 'arm64-apple-darwin'* ]]; then
-  VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
-fi
+# VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
+# if [[ $MACHTYPE == 'arm64-apple-darwin'* ]]; then
+VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
+# fi
 
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Debug
@@ -29,7 +29,7 @@ mkdir $PROJECT_DIR/build/odbc/logs
 
 mkdir $BUILD_DIR
 cd $BUILD_DIR
-cmake ../src -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_PREFIX_PATH="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}"
+cmake ../src -DCMAKE_INSTALL_PREFIX="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON"
 make -j 4
 
 RET_CODE=$?

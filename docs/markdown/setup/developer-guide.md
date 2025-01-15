@@ -89,7 +89,14 @@ Driver installer detects existing driver and isn't allowing installation
 
 ## MacOS
 
+install iODBC Manager
+vcpkg bootstrap?
+
 1. Install dependencies
+`autoconf-archive`
+`brew install automake`
+`brew install libtool`
+`brew install autoconf`
    1. `brew install cmake`
    2. `brew install libiodbc`  
       - You may need to unlink `unixodbc` if you already have this installed. Use `brew unlink unixodbc`.

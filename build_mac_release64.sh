@@ -13,13 +13,12 @@
 
 cd src
 vcpkg install
-vcpkg integrate install
 cd ..
 
-#VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
-#if [[ $MACHTYPE == 'x86_64'* ]]; then
-VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
-#fi
+VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
+if [[ $(uname -m) == 'arm64' ]]; then
+  VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
+fi
 
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Release
@@ -27,7 +26,7 @@ PROJECT_DIR=$(pwd)
 
 mkdir $BUILD_DIR
 cd $BUILD_DIR
-cmake ../src -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_PREFIX_PATH="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}"
+cmake ../src -DCMAKE_INSTALL_PREFIX="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DCODE_COVERAGE="OFF" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON"
 make -j 4
 
 RET_CODE=$?

@@ -260,10 +260,7 @@ ConversionResult::Type ApplicationDataBuffer::PutStrToStrBuffer(
   if (ANSI_STRING_ONLY) {
     bytesRequired = value.length() * outCharSize;
   } else {
-    thread_local std::wstring_convert<std::codecvt_utf8<wchar_t >, wchar_t>
-      converter;
-    std::wstring inString = converter.from_bytes(value.c_str());
-    bytesRequired = inString.length() * outCharSize;
+    bytesRequired = (std::mbstowcs(nullptr, value.c_str(), 0) * outCharSize);
   }
 
   SqlLen* resLenPtr = GetResLen();

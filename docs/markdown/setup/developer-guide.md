@@ -23,7 +23,7 @@ C/C++ usage and formatting.
 - [ Optional ] Log configurations
 
   Set these 2 variables only if you would like to set a custom log path or log level for connection tests; it is completely optional.
-    1. `TIMESTREAM_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BitQuillUser\\Desktop\\Timestream ODBC Driver"`)
+    1. `TIMESTREAM_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\username\\Desktop\\Timestream ODBC Driver"`)
 
     The user needs to ensure that the directory mentioned in the log file path exists or the driver will ignore the user's passed-in value and create the log file in the default log path. Do **not** include a slash at the end of the log path.
 
@@ -153,23 +153,32 @@ have all been set correctly:
                                  lcov \
                                  git \
                                  unixodbc-dev \
-                                 valgrind \
                                  zip \
                                  unzip \
                                  tar \
-                                 rpm                         
+                                 rpm \
+                                 odbcinst
 ```
-   2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
-   3. Set all necessary environment variables and run the following command to register the ODBC driver. 
+   2. Setup VCPKG.
+    a. `git clone https://github.com/microsoft/vcpkg.git ~`
+    b. `cd ~/vcpkg`
+    c. `./bootstrap`
+    d. `export VCPKG_ROOT=$(pwd)`
+    e. `cd -`
+
+   3. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
+   4. Set all necessary environment variables and run the following command to register the ODBC driver.
 
       `./scripts/register_driver_unix.sh`
-   4. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   5. Set environment variables for testing and double-check if all dev environment variables are set running `scripts/env_variables_check.sh`.
    5. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
    6. Once configured, run the tests under the repository root folder:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 
 ### Using openSUSE 64bit
+
+opensuse uses RPM for build script
 
 1. Install all dependencies
    1. openSUSE dev dependencies
@@ -181,9 +190,7 @@ have all been set correctly:
                                  gcc \
                                  gcc-c++ \
                                  valgrind \
-                                 lcov \
                                  git \
-                                 valgrind \
                                  zip \
                                  unzip \
                                  tar \
@@ -238,7 +245,6 @@ have all been set correctly:
                                  lcov \
                                  git \
                                  unixodbc-dev \
-                                 valgrind \
                                  zip \
                                  unzip \
                                  tar \

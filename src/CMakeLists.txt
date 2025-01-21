@@ -20,16 +20,18 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 
 # Mac
 if (UNIX AND APPLE)
-  include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-osx/include) # TODO: Fix TMP
+    include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-osx/include)
     include_directories(/usr/local/iODBC/include)
 endif()
 
 # Linux 
 if (UNIX AND NOT APPLE)
-    if (${INSTALLER_TYPE} STREQUAL "RPM" AND ${BITNESS} EQUAL 64)
-        set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib64)
+    if (${BITNESS} EQUAL 64)
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux)
+        include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include)
     else()
-        set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux) #TODO: fix 32 bit
+        include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include) # TODO: Fix 32 bit
     endif()
 endif()
 

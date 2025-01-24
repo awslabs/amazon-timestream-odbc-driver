@@ -29,6 +29,7 @@ endif()
 find_package(Boost 1.53 REQUIRED COMPONENTS unit_test_framework chrono thread system regex)
 
 find_package(ODBC REQUIRED)
+find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query)
 if (UNIX)
     find_package(ZLIB REQUIRED)
 endif()

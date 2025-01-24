@@ -89,15 +89,8 @@ Driver installer detects existing driver and isn't allowing installation
 
 ## MacOS
 
-install iODBC Manager
-vcpkg bootstrap?
-
 1. Install dependencies
-`autoconf-archive`
-`brew install automake`
-`brew install libtool`
-`brew install autoconf`
-   1. `brew install cmake`
+   1. `brew install cmake automake autoconf autoconf-archive libtool`
    2. `brew install libiodbc`  
       - You may need to unlink `unixodbc` if you already have this installed. Use `brew unlink unixodbc`.
       - You may need to run `brew link --overwrite --force libiodbc`.
@@ -107,6 +100,7 @@ vcpkg bootstrap?
    4. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
       - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
       - If you have XCode application, to ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.
+  5. Install iODBC Manager: [iodbcWiki/Downloads](https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads)
 2. Run one of the build scripts to create an initial compilation.
    1. E.g.: from the root of the Timestream ODBC repository, run `./build_mac_release64.sh`
    2. The generated driver files will be placed in the `build/odbc/lib` folder.

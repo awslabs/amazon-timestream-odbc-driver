@@ -13,7 +13,7 @@
 
 project(performance_results)
 
-find_package(Boost 1.81 REQUIRED COMPONENTS thread)
+find_package(Boost 1.71 REQUIRED COMPONENTS thread)
 find_package(ODBC REQUIRED)
 # Source, headers, and include dirs
 set(SOURCE_FILES performance_odbc_results.cpp)

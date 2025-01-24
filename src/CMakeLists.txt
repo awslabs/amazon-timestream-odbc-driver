@@ -30,8 +30,8 @@ if (UNIX AND NOT APPLE)
         set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux)
         include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include)
     else()
-        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux) #TODO: fix 32 bit
-        include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include) # TODO: Fix 32 bit
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-linux)
+        include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-linux/include)
     endif()
 endif()
 

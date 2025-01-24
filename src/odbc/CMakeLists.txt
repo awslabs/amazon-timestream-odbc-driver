@@ -33,7 +33,7 @@ find_package(aws-cpp-sdk-sts CONFIG REQUIRED)
 find_package(aws-cpp-sdk-timestream-query CONFIG REQUIRED)
 
 find_package(ODBC REQUIRED)
-find_package(Boost CONFIG REQUIRED)
+find_package(Boost REQUIRED)
 if (UNIX)
     find_package(ZLIB REQUIRED)
 endif()

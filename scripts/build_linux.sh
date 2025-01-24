@@ -24,8 +24,7 @@ BUILD_DIR=cmake-build"$1"
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 
-# TODO: Add 32 Bit
-VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-linux'
+VCPKG_INSTALLED_DIR='src/vcpkg_installed/x86-linux'
 if [[ $(uname -m) == 'x86_64' ]]; then
   VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-linux'
 fi

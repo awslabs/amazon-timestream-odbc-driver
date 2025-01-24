@@ -159,12 +159,12 @@ have all been set correctly:
                                  rpm \
                                  odbcinst
 ```
-   2. Setup VCPKG.
-    a. `git clone https://github.com/microsoft/vcpkg.git ~`
-    b. `cd ~/vcpkg`
-    c. `./bootstrap`
-    d. `export VCPKG_ROOT=$(pwd)`
-    e. `cd -`
+   2. Setup VCPKG
+    a. Clone VCPKG: `git clone https://github.com/microsoft/vcpkg.git ~/vcpkg`
+    b. Change directories: `cd ~/vcpkg`
+    c. Bootstrap environment: `./bootstrap`
+    d. Set VCPKG_ROOT: `export VCPKG_ROOT=$(pwd)`
+    e. Create symbolic link: `ln -s $(pwd)/vcpkg /usr/local/bin/vcpkg`
 
    3. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
    4. Set all necessary environment variables and run the following command to register the ODBC driver.
@@ -176,16 +176,16 @@ have all been set correctly:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 
-### Using openSUSE 64bit
+### Using Amazon Linux 2023 64bit
 
-opensuse uses RPM for build script
+Amazon Linux uses RPM for build script
 
 1. Install all dependencies
-   1. openSUSE dev dependencies
+   1. Amazon Linux dev dependencies
       E.g.
 ```
-           zypper refresh \
-           && zypper install wget \
+           yum update \
+           && yum install wget \
                                  curl \
                                  gcc \
                                  gcc-c++ \
@@ -195,32 +195,37 @@ opensuse uses RPM for build script
                                  unzip \
                                  tar \
                                  rpm    \
-                                 libopenssl-3-devel \
                                  openssl \
                                  cmake \
                                  libcurl-devel \
                                  unixODBC \
                                  unixODBC-devel \
-                                 rpmbuild \
-                                 libboost_regex-devel \
-                                 libboost_system-devel \
-                                 libboost_thread-devel \
-                                 libboost_chrono-devel \
-                                 libboost_test-devel \
-                                 boost-devel 
-        
+                                 perl-IPC-Cmd \
+                                 perl-FindBin \
+                                 perl-File-Compare \
+                                 lcov \
+                                 rpm-build \
+                                 boost-devel
 ```
-   2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
-   3. Set all necessary environment variables and run the following command to register the ODBC driver. 
+   2. Setup VCPKG
+    a. Clone VCPKG: `git clone https://github.com/microsoft/vcpkg.git ~/vcpkg`
+    b. Change directories: `cd ~/vcpkg`
+    c. Bootstrap environment: `./bootstrap`
+    d. Set VCPKG_ROOT: `export VCPKG_ROOT=$(pwd)`
+    e. Create symbolic link: `ln -s $(pwd)/vcpkg /usr/local/bin/vcpkg`
+
+   3. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
+   4. Set all necessary environment variables and run the following command to register the ODBC driver. 
 
       `sudo ./scripts/register_driver_unix.sh`
-   4. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
-   5. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
-   6. Once configured, run the tests under repository root folder:
+   5. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   6. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
+   7. Once configured, run the tests under repository root folder:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 
 ### Using Ubuntu 32bit
+
 
 1. Install all dependencies
    1. Ubuntu dev dependencies
@@ -228,54 +233,54 @@ opensuse uses RPM for build script
 ```
            apt-get -y update \
            && apt-get -y install wget \
-                                 curl \
-                                 libcurl4-openssl-dev \
-                                 libssl-dev \
-                                 uuid-dev \
-                                 zlib1g-dev \
-                                 libpulse-dev \
-                                 gcc \
-                                 gcc-multilib  \
-                                 g++ \
-                                 g++-multilib \
+                                 ninja-build \
                                  build-essential \
-                                 valgrind \
-                                 libboost-all-dev \
-                                 libsasl2-dev \
+                                 libssl-dev \
+                                 libgmp-dev \
+                                 libmpfr-dev \
+                                 libmpc-dev \
+                                 pkg-config \
                                  lcov \
-                                 git \
                                  unixodbc-dev \
                                  zip \
                                  unzip \
                                  tar \
                                  rpm                           
 ```
-   2. Install cmake
-   `apt-get install cmake`
+   2. Install cmake (may take hours)
+    a. Get source code: `wget https://cmake.org/files/v3.31/cmake-3.31.4.tar.gz`
+    b. Extract tar ball: `tar -xzvf cmake-3.31.4.tar.gz`
+    c. Change directories: `cd cmake-3.31.4`
+    d. Bootstrap environment: `./bootstrap`
+    e. Compile target: `make`
+    f. Install target: `make install`
 
-   3. The version of cmake installed is lower than 3.20 which is the minimal required version. Follow below steps to build cmake 3.20 (or above) from source. 
-    
-      1. Download cmake 3.20 or above from https://github.com/Kitware/CMake/releases/
+   3. Install gcc (may take hours)
+    a. Get source code: `wget https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz`
+    b. Extract tar ball: `tar -xvzf gcc-10.2.0.tar.gz`
+    c. Change directories: `cd gcc-10.2.0`
+    d. Compile cmake: `make -j$(nproc)`
+    e. Install cmake: `make install`
 
-      2. Under cmake source directory create a build directory 
-         
-         `mkdir build`
-    
-      3. Run `cmake` under source directory
-      4. `cd build` and run `make`
-      5. Install the new cmake
-         
-         `sudo make install`
+   4. Setup Environment
+    a. Set compiler bin directory: `export PATH=/opt/gcc-10/bin:$PATH`
+    b. Set CMake compiler: `export CXX=/opt/gcc-10/bin/g++`
+    c. Set linker path: `export LD_LIBRARY_PATH=/opt/gcc-10/lib`
 
-      6. Add `/usr/local/bin` to PATH and make sure it is ahead of lower version cmake path
-         `export PATH=/usr/local/bin:$PATH`
-   4. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
-   5. Set all necessary environment variables and run the following command to register the ODBC driver. 
+   5. Setup VCPKG
+    a. Clone VCPKG: `git clone https://github.com/microsoft/vcpkg.git ~/vcpkg`
+    b. Change directories: `cd ~/vcpkg`
+    c. Bootstrap environment: `./bootstrap`
+    d. Set VCPKG_ROOT: `export VCPKG_ROOT=$(pwd)`
+    e. Create symbolic link: `ln -s $(pwd)/vcpkg /usr/local/bin/vcpkg`
+
+   6. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
+   7. Set all necessary environment variables and run the following command to register the ODBC driver.
 
       `./scripts/register_driver_unix.sh`
-   6. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
-   7. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
-   8. Once configured, run the tests under repository root folder:
+   8. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   9. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
+   10. Once configured, run the tests under repository root folder:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 

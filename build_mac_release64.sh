@@ -16,7 +16,7 @@ vcpkg install
 cd ..
 
 VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-osx'
-if [[ $(uname -m) == 'arm64' ]]; then
+if [[ $(uname -m) =~ ^arm.* || $(uname -m) == 'aarch64' ]]; then
   VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
 fi
 

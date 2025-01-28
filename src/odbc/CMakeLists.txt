@@ -28,8 +28,11 @@ include(CPackComponent)
 
 message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
+
+find_package(aws-cpp-sdk-sts CONFIG REQUIRED)
+find_package(aws-cpp-sdk-timestream-query CONFIG REQUIRED)
+
 find_package(ODBC REQUIRED)
-find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query)
 find_package(Boost REQUIRED)
 if (UNIX)
     find_package(ZLIB REQUIRED)
@@ -146,6 +149,7 @@ endif ()
 
 set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
+target_link_libraries(${TARGET} aws-cpp-sdk-core aws-cpp-sdk-timestream-query aws-cpp-sdk-sts)
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
 target_link_libraries(${TARGET} ${AWSSDK_LINK_LIBRARIES})
 

@@ -4,6 +4,14 @@ For documentation regarding Power BI connector, please refer to [build Power BI 
 
 ## Pre-requisites
 
+### Setup VCPKG
+- The ODBC driver uses VCPKG for certain dependencies. You will need to clone the repository and set the `VCPKG_ROOT` environment variable, if not already configured.
+   1. Clone VCPKG: `git clone https://github.com/microsoft/vcpkg.git ~/vcpkg`
+   2. Change directories: `cd ~/vcpkg`
+   3. Bootstrap environment: `./bootstrap`
+   4. Set VCPKG_ROOT: `export VCPKG_ROOT=$(pwd)`
+   5. Create symbolic link: `ln -s $(pwd)/vcpkg /usr/local/bin/vcpkg`
+
 ### C/C++ Formatting
 
 - This project uses [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html) as a basis for
@@ -23,7 +31,7 @@ C/C++ usage and formatting.
 - [ Optional ] Log configurations
 
   Set these 2 variables only if you would like to set a custom log path or log level for connection tests; it is completely optional.
-    1. `TIMESTREAM_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\BitQuillUser\\Desktop\\Timestream ODBC Driver"`)
+    1. `TIMESTREAM_LOG_PATH`=`<path_to_log_file>`(e.g.:`"C:\\Users\\<username>\\Desktop\\Timestream ODBC Driver"`)
 
     The user needs to ensure that the directory mentioned in the log file path exists or the driver will ignore the user's passed-in value and create the log file in the default log path. Do **not** include a slash at the end of the log path.
 
@@ -90,38 +98,41 @@ Driver installer detects existing driver and isn't allowing installation
 ## MacOS
 
 1. Install dependencies
-   1. `brew install cmake`
-   2. `brew install libiodbc`  
+   a. `brew install cmake automake autoconf autoconf-archive libtool`
+   b. `brew install libiodbc`
       - You may need to unlink `unixodbc` if you already have this installed. Use `brew unlink unixodbc`.
       - You may need to run `brew link --overwrite --force libiodbc`.
-   3. `brew install boost`
-   4. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
+      - ln -s /opt/homebrew/opt/llvm/bin/llvm-cov /usr/local/bin/llvm-cov
+      - ln -s /usr/local/iODBC/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
+   c. `brew install boost`
+   d. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
       - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
       - If you have XCode application, to ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.
+   e. Install iODBC Manager: [iodbcWiki/Downloads](https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads)
 2. Run one of the build scripts to create an initial compilation.
-   1. E.g.: from the root of the Timestream ODBC repository, run `./build_mac_release64.sh`
-   2. The generated driver files will be placed in the `build/odbc/lib` folder.
+   a. E.g.: from the root of the Timestream ODBC repository, run `./build_mac_release64.sh`
+   b. The generated driver files will be placed in the `build/odbc/lib` folder.
 3. Set the environment variable `ODBCINSTINI`. On a developer's machine, set it to `<repo-folder>/build/odbc/lib/timestream-odbc-install.ini`.
 4. Set the environment variable `DYLD_LIBRARY_PATH`. On a developer's machine, set it to `<repo-folder>/build/odbc/lib:$DYLD_LIBRARY_PATH`.
 5. Run the following command to register the ODBC driver.
    `./scripts/register_driver_unix.sh`.
 6. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
 7. Once configured, run the tests:
-      - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
-      - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests  --catch_system_errors=false`.
+  - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
+  - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests  --catch_system_errors=false`.
 
 You should have all the following environment variables set. If you encounter any issues, check that these variables
 have all been set correctly:
-- `AWS_ACCESS_KEY_ID` (from prerequisites)
-- `AWS_SECRET_ACCESS_KEY` (from prerequisites)
-- `ODBCINSTINI`
-- `DYLD_LIBRARY`
+  - `AWS_ACCESS_KEY_ID` (from prerequisites)
+  - `AWS_SECRET_ACCESS_KEY` (from prerequisites)
+  - `ODBCINSTINI`
+  - `DYLD_LIBRARY_PATH`
 
 ## Linux
 
 ### Using Ubuntu 64bit
 
-1. Install all dependencies
+Install all dependencies
    1. Ubuntu dev dependencies
       E.g.
 ```
@@ -144,55 +155,52 @@ have all been set correctly:
                                  lcov \
                                  git \
                                  unixodbc-dev \
-                                 valgrind \
                                  zip \
                                  unzip \
                                  tar \
-                                 rpm                         
+                                 rpm \
+                                 odbcinst
 ```
    2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
-   3. Set all necessary environment variables and run the following command to register the ODBC driver. 
+   3. Set all necessary environment variables and run the following command to register the ODBC driver.
 
       `./scripts/register_driver_unix.sh`
-   4. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   4. Set environment variables for testing and double-check if all dev environment variables are set running `scripts/env_variables_check.sh`.
    5. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
    6. Once configured, run the tests under the repository root folder:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 
-### Using openSUSE 64bit
+### Using Amazon Linux 2023 64bit
 
-1. Install all dependencies
-   1. openSUSE dev dependencies
+Amazon Linux uses RPM for build script
+
+Install all dependencies
+   1. Amazon Linux dev dependencies
       E.g.
 ```
-           zypper refresh \
-           && zypper install wget \
+           yum update \
+           && yum install wget \
                                  curl \
                                  gcc \
                                  gcc-c++ \
                                  valgrind \
-                                 lcov \
                                  git \
-                                 valgrind \
                                  zip \
                                  unzip \
                                  tar \
                                  rpm    \
-                                 libopenssl-3-devel \
                                  openssl \
                                  cmake \
                                  libcurl-devel \
                                  unixODBC \
                                  unixODBC-devel \
-                                 rpmbuild \
-                                 libboost_regex-devel \
-                                 libboost_system-devel \
-                                 libboost_thread-devel \
-                                 libboost_chrono-devel \
-                                 libboost_test-devel \
-                                 boost-devel 
-        
+                                 perl-IPC-Cmd \
+                                 perl-FindBin \
+                                 perl-File-Compare \
+                                 lcov \
+                                 rpm-build \
+                                 boost-devel
 ```
    2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
    3. Set all necessary environment variables and run the following command to register the ODBC driver. 
@@ -206,61 +214,54 @@ have all been set correctly:
 
 ### Using Ubuntu 32bit
 
-1. Install all dependencies
+
+Install all dependencies
    1. Ubuntu dev dependencies
       E.g.
 ```
            apt-get -y update \
            && apt-get -y install wget \
-                                 curl \
-                                 libcurl4-openssl-dev \
-                                 libssl-dev \
-                                 uuid-dev \
-                                 zlib1g-dev \
-                                 libpulse-dev \
-                                 gcc \
-                                 gcc-multilib  \
-                                 g++ \
-                                 g++-multilib \
+                                 ninja-build \
                                  build-essential \
-                                 valgrind \
-                                 libboost-all-dev \
-                                 libsasl2-dev \
+                                 libssl-dev \
+                                 libgmp-dev \
+                                 libmpfr-dev \
+                                 libmpc-dev \
+                                 pkg-config \
                                  lcov \
-                                 git \
                                  unixodbc-dev \
-                                 valgrind \
                                  zip \
                                  unzip \
                                  tar \
                                  rpm                           
 ```
-   2. Install cmake
-   `apt-get install cmake`
+   2. Install cmake (may take hours)
+    a. Get source code: `wget https://cmake.org/files/v3.31/cmake-3.31.4.tar.gz`
+    b. Extract tar ball: `tar -xzvf cmake-3.31.4.tar.gz`
+    c. Change directories: `cd cmake-3.31.4`
+    d. Bootstrap environment: `./bootstrap`
+    e. Compile target: `make`
+    f. Install target: `make install`
 
-   3. The version of cmake installed is lower than 3.20 which is the minimal required version. Follow below steps to build cmake 3.20 (or above) from source. 
-    
-      1. Download cmake 3.20 or above from https://github.com/Kitware/CMake/releases/
+   3. Install gcc (may take hours)
+    a. Get source code: `wget https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.gz`
+    b. Extract tar ball: `tar -xvzf gcc-10.2.0.tar.gz`
+    c. Change directories: `cd gcc-10.2.0`
+    d. Compile cmake: `make -j$(nproc)`
+    e. Install cmake: `make install`
 
-      2. Under cmake source directory create a build directory 
-         
-         `mkdir build`
-    
-      3. Run `cmake` under source directory
-      4. `cd build` and run `make`
-      5. Install the new cmake
-         
-         `sudo make install`
+   4. Setup Environment
+    a. Set compiler bin directory: `export PATH=/opt/gcc-10/bin:$PATH`
+    b. Set CMake compiler: `export CXX=/opt/gcc-10/bin/g++`
+    c. Set linker path: `export LD_LIBRARY_PATH=/opt/gcc-10/lib`
 
-      6. Add `/usr/local/bin` to PATH and make sure it is ahead of lower version cmake path
-         `export PATH=/usr/local/bin:$PATH`
-   4. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
-   5. Set all necessary environment variables and run the following command to register the ODBC driver. 
+   5. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
+   6. Set all necessary environment variables and run the following command to register the ODBC driver.
 
       `./scripts/register_driver_unix.sh`
-   6. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
-   7. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
-   8. Once configured, run the tests under repository root folder:
+   7. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   8. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
+   9. Once configured, run the tests under repository root folder:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 

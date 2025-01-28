@@ -60,5 +60,6 @@ CMakeCache.txt
 src/aws-sdk-cpp/
 src/tests/input/credentials
 src/out/
+src/vcpkg_installed
 scripts/postinst_unix32.sh
 scripts/postinst_unix64.sh

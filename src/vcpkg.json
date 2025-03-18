@@ -1,6 +1,7 @@
 {
     "dependencies": [
-      { "name": "aws-sdk-cpp", "features": ["core","dynamodb","kinesis","s3","sts","timestream-query", "timestream-write"] },
+      "aws-sdk-cpp",
+      { "name": "aws-sdk-cpp", "features": ["timestream-query", "timestream-write", "sts"] },
       "aws-c-s3",
       { "name": "boost-test", "features": ["asio", "chrono", "interprocess", "regex", "system", "thread"] },
       "curl"

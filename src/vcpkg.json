@@ -1,10 +1,15 @@
 {
     "dependencies": [
-      "aws-sdk-cpp",
       { "name": "aws-sdk-cpp", "features": ["timestream-query", "timestream-write", "sts"] },
       "aws-c-s3",
       "boost",
-      { "name": "boost-test", "features": ["asio", "chrono", "interprocess", "regex", "system", "thread"] },
+      "boost-test",
+      "boost-asio",
+      "boost-chrono",
+      "boost-interprocess",
+      "boost-regex",
+      "boost-system",
+      "boost-thread",
       "curl"
     ]
 }

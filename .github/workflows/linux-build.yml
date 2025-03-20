@@ -128,23 +128,23 @@ jobs:
       run: |
         ./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
 
-    - name: upload-odbc-test-report
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
-      with:
-        check_name: "Ubuntu 20.04 Build Integration Test Results Check"
-        comment_title: "Ubuntu 20.04 Build Integration Test Results"
-        files: ./odbc_test_result.xml
-
-    - name: upload-odbc-test-file
-      if: always() && (steps.runodbctests.outcome == 'failure')
-      uses: actions/upload-artifact@v4
-      with:
-        name: odbc-test-results-linux64-release
-        path: |
-          ./odbc_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log 
-          ./aws_sdk_*.log
+      #    - name: upload-odbc-test-report
+      #      if: always()
+      #      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      #      with:
+      #        check_name: "Ubuntu 20.04 Build Integration Test Results Check"
+      #        comment_title: "Ubuntu 20.04 Build Integration Test Results"
+      #        files: ./odbc_test_result.xml
+      #
+      #    - name: upload-odbc-test-file
+      #      if: always() && (steps.runodbctests.outcome == 'failure')
+      #      uses: actions/upload-artifact@v4
+      #      with:
+      #        name: odbc-test-results-linux64-release
+      #        path: |
+      #          ./odbc_test_result.xml
+      #          ./build/odbc/logs/timestream_odbc_*.log 
+      #          ./aws_sdk_*.log
 
   build-linux64-debug:
     runs-on: ubuntu-20.04
@@ -264,27 +264,27 @@ jobs:
         recreate: true
         path: coverage-cobertura.md
   
-    - name: upload-odbc-test-report
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
-      with:
-        check_name: "Ubuntu 20.04 Debug Build Integration Test Results Check"
-        comment_title: "Ubuntu 20.04 Debug Build Integration Test Results"
-        files: ./odbc_test_result.xml
-
-    - name: upload-odbc-test-file
-      if: always() && (steps.runodbctests.outcome == 'failure')
-      uses: actions/upload-artifact@v4
-      with:
-        name: odbc-test-results-linux64-debug
-        path: |
-          ./odbc_test_result.xml
-          ./build/odbc/logs/timestream_odbc_*.log 
-          ./aws_sdk_*.log   
-
-    - name: upload-coverage
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: code-coverage-Linux
-        path: cmake-build64/ccov/all-merged
+      #    - name: upload-odbc-test-report
+      #      if: always()
+      #      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      #      with:
+      #        check_name: "Ubuntu 20.04 Debug Build Integration Test Results Check"
+      #        comment_title: "Ubuntu 20.04 Debug Build Integration Test Results"
+      #        files: ./odbc_test_result.xml
+      #
+      #    - name: upload-odbc-test-file
+      #      if: always() && (steps.runodbctests.outcome == 'failure')
+      #      uses: actions/upload-artifact@v4
+      #      with:
+      #        name: odbc-test-results-linux64-debug
+      #        path: |
+      #          ./odbc_test_result.xml
+      #          ./build/odbc/logs/timestream_odbc_*.log 
+      #          ./aws_sdk_*.log   
+      #
+      #    - name: upload-coverage
+      #      if: always()
+      #      uses: actions/upload-artifact@v4
+      #      with:
+      #        name: code-coverage-Linux
+      #        path: cmake-build64/ccov/all-merged

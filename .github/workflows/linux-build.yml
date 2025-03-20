@@ -86,6 +86,8 @@ jobs:
 
     - name: register-odbc-driver
       run: |
+        sudo apt update
+        sudo apt install odbcinst
         chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         sudo bash scripts/register_driver_unix.sh
@@ -121,7 +123,6 @@ jobs:
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
-          ./aws_sdk_*.log
 
     # run odbc tests
     - name: run-odbc-tests
@@ -200,6 +201,8 @@ jobs:
 
     - name: register-odbc-driver
       run: |
+        sudo apt update
+        sudo apt install odbcinst
         chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         sudo bash scripts/register_driver_unix.sh
@@ -235,7 +238,6 @@ jobs:
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
-          ./aws_sdk_*.log
 
     # run odbc tests
     - name: run-odbc-tests

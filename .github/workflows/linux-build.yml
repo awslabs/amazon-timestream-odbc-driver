@@ -66,7 +66,7 @@ jobs:
       if: success()
       run: |
         sudo apt update
-        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libsasl2-dev lcov autoconf-archive
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libsasl2-dev lcov autoconf-archive libxml2 libxslt
    
     - name: configure-and-build-driver
       run: |
@@ -179,7 +179,7 @@ jobs:
       if: success()
       run: |
         sudo apt update
-        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libsasl2-dev lcov autoconf-archive
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libsasl2-dev lcov autoconf-archive libxml2 libxslt
 
     - name: configure-and-build-driver
       run: |

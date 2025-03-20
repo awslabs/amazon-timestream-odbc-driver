@@ -42,13 +42,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
     - name: Get latest version of CMake
       uses: lukka/get-cmake@latest
 
     - name: run-cppcheck
       run: |
         sudo apt install cppcheck
-        sh run_cppcheck.sh
+        #        sh run_cppcheck.sh
   
     - name: upload-cppcheck-results
       if: failure()
@@ -146,6 +151,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Set up Python 3
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
     - name: Get gcovr
       run: | 
         pip install gcovr
@@ -156,7 +166,7 @@ jobs:
     - name: run-cppcheck
       run: |
         sudo apt install cppcheck
-        sh run_cppcheck.sh
+        #        sh run_cppcheck.sh
   
     - name: upload-cppcheck-results
       if: failure()

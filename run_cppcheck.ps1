@@ -16,7 +16,7 @@
 #  --force: force checks all define combinations (default max is 12)
 #  --suppress=objectIndex: seemingly false-positive
 
-cppcheck --check-level=exhaustive --force --library=boost --library=timestream .\src\ 2>  .\cppcheck-results.log
+cppcheck --check-level=exhaustive --force --library=boost --library=timestream -i\src\vcpkg_installed .\src\ 2>  .\cppcheck-results.log
 If ((Get-Content "cppcheck-results.log") -eq $Null) {
   exit 0
 }

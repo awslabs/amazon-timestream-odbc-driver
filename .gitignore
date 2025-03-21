@@ -57,8 +57,8 @@ CMakeCache.txt
 /src/PowerBIConnector/AmazonTimestreamAADConnector/bin/Debug/
 /src/PowerBIConnector/AmazonTimestreamAADConnector/obj/
 /src/PowerBIConnector/AmazonTimestreamAADConnector/.vs/
-src/aws-sdk-cpp/
 src/tests/input/credentials
 src/out/
+src/vcpkg_installed
 scripts/postinst_unix32.sh
 scripts/postinst_unix64.sh

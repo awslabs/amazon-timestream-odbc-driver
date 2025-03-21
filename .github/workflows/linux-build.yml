@@ -38,15 +38,16 @@ env:
 
 jobs:
   build-linux64:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Get latest version of CMake
       uses: lukka/get-cmake@latest
 
     - name: run-cppcheck
       run: |
+        sudo apt update
         sudo apt install cppcheck
         sh run_cppcheck.sh
   
@@ -61,7 +62,7 @@ jobs:
       if: success()
       run: |
         sudo apt update
-        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libsasl2-dev lcov
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev gcc gcc-multilib  g++ g++-multilib build-essential valgrind libboost-all-dev libsasl2-dev lcov autoconf-archive libxml2-dev libxslt-dev unixodbc-dev
    
     - name: configure-and-build-driver
       run: |
@@ -80,6 +81,8 @@ jobs:
 
     - name: register-odbc-driver
       run: |
+        sudo apt update
+        sudo apt install odbcinst
         chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         sudo bash scripts/register_driver_unix.sh
@@ -101,7 +104,7 @@ jobs:
 
     - name: upload-unit-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         check_name: "Ubuntu 20.04 Build Unit Test Results Check"
         comment_title: "Ubuntu 20.04 Build Unit Test Results"
@@ -115,7 +118,6 @@ jobs:
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
-          ./aws_sdk_*.log
 
     # run odbc tests
     - name: run-odbc-tests
@@ -125,12 +127,12 @@ jobs:
 
     - name: upload-odbc-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         check_name: "Ubuntu 20.04 Build Integration Test Results Check"
         comment_title: "Ubuntu 20.04 Build Integration Test Results"
         files: ./odbc_test_result.xml
-
+    
     - name: upload-odbc-test-file
       if: always() && (steps.runodbctests.outcome == 'failure')
       uses: actions/upload-artifact@v4
@@ -142,9 +144,9 @@ jobs:
           ./aws_sdk_*.log
 
   build-linux64-debug:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Get gcovr
       run: | 
@@ -155,6 +157,7 @@ jobs:
 
     - name: run-cppcheck
       run: |
+        sudo apt update
         sudo apt install cppcheck
         sh run_cppcheck.sh
   
@@ -169,7 +172,7 @@ jobs:
       if: success()
       run: |
         sudo apt update
-        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev linux-headers-$(uname -r) gcc gcc-multilib  g++ g++-multilib linux-headers-$(uname -r) build-essential valgrind libboost-all-dev libsasl2-dev lcov
+        sudo apt install libcurl4-openssl-dev libssl-dev uuid-dev zlib1g-dev libpulse-dev gcc gcc-multilib  g++ g++-multilib build-essential valgrind libboost-all-dev libsasl2-dev lcov autoconf-archive libxml2-dev libxslt-dev unixodbc-dev
 
     - name: configure-and-build-driver
       run: |
@@ -188,6 +191,8 @@ jobs:
 
     - name: register-odbc-driver
       run: |
+        sudo apt update
+        sudo apt install odbcinst
         chmod +r -R ${{env.ODBC_LIB_PATH}}
         chmod +x scripts/register_driver_unix.sh
         sudo bash scripts/register_driver_unix.sh
@@ -209,7 +214,7 @@ jobs:
   
     - name: upload-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         check_name: "Ubuntu 20.04 Debug Build Unit Test Results Check"
         comment_title: "Ubuntu 20.04 Debug Build Unit Test Results"
@@ -223,7 +228,6 @@ jobs:
         path: |
           ./odbc_unit_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
-          ./aws_sdk_*.log
 
     # run odbc tests
     - name: run-odbc-tests
@@ -256,12 +260,12 @@ jobs:
   
     - name: upload-odbc-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         check_name: "Ubuntu 20.04 Debug Build Integration Test Results Check"
         comment_title: "Ubuntu 20.04 Debug Build Integration Test Results"
         files: ./odbc_test_result.xml
-
+    
     - name: upload-odbc-test-file
       if: always() && (steps.runodbctests.outcome == 'failure')
       uses: actions/upload-artifact@v4
@@ -271,7 +275,7 @@ jobs:
           ./odbc_test_result.xml
           ./build/odbc/logs/timestream_odbc_*.log 
           ./aws_sdk_*.log   
-
+    
     - name: upload-coverage
       if: always()
       uses: actions/upload-artifact@v4

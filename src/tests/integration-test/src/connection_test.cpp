@@ -26,6 +26,10 @@
 #include <sql.h>
 #include <sqlext.h>
 
+#include <aws/core/Aws.h>
+#include <aws/timestream-query/TimestreamQueryClient.h>
+#include <aws/timestream-query/model/DescribeEndpointsRequest.h>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/data/monomorphic.hpp>
 #include <string>
@@ -95,9 +99,36 @@ BOOST_AUTO_TEST_CASE(TestDriverConnection) {
 }
 
 BOOST_AUTO_TEST_CASE(TestDriverConnectionWithEndpoint) {
+  // Timestream's default query endpoint cannot be used as
+  // an endpoint override, as using an endpoint override disables
+  // endpoint discovery. Instead, a DescribeEndpoints call must
+  // be made and the returned endpoint will be used as the
+  // endpoint override.
+  std::string endpoint;
+  Aws::SDKOptions options;
+  Aws::InitAPI(options);
+  {
+    Aws::Client::ClientConfiguration config;
+    config.region = "us-west-2";
+    config.enableEndpointDiscovery = true;
+    Aws::TimestreamQuery::TimestreamQueryClient client(config);
+    auto outcome = client.DescribeEndpoints();
+    if (!outcome.IsSuccess()) {
+      BOOST_FAIL("DescribeEndpoints failed: " + outcome.GetError().GetMessage());
+    } else {
+      const auto& endpoints = outcome.GetResult().GetEndpoints();
+      if (!endpoints.empty()) {
+        endpoint = endpoints[0].GetAddress();
+      } else {
+        BOOST_FAIL("DescribeEndpoints returned no endpoints");
+      }
+    }
+  }
+  Aws::ShutdownAPI(options);
+
   std::string connectionString;
   std::string misc(
-      "EndpointOverride=query.timestream.us-west-2.amazonaws.com;");
+      "EndpointOverride=https://" + endpoint + ";");
 
   CreateDsnConnectionStringForAWS(connectionString, "", "", misc);
 

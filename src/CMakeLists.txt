@@ -45,10 +45,10 @@ if (WIN32)
     endif()
     set(CMAKE_BUILD_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
-    # copy AWS DLL to ${CMAKE_BUILD_DIR} as they are needed for Windows building and test running
+    # Copy AWS DLL to ${CMAKE_BUILD_DIR} as they are needed for Windows building and test running.
     configure_file(${AWS_DLL_DIR}/aws-cpp-sdk-core.dll ${CMAKE_BUILD_DIR}/aws-cpp-sdk-core.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-cpp-sdk-timestream-query.dll ${CMAKE_BUILD_DIR}/aws-cpp-sdk-timestream-query.dll COPYONLY)
-    # Timestream-write dll is needed for data writer tool
+    # Timestream-write dll is needed for data writer tool.
     configure_file(${AWS_DLL_DIR}/aws-cpp-sdk-timestream-write.dll ${CMAKE_BUILD_DIR}/aws-cpp-sdk-timestream-write.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-cpp-sdk-sts.dll ${CMAKE_BUILD_DIR}/aws-cpp-sdk-sts.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-c-auth.dll ${CMAKE_BUILD_DIR}/aws-c-auth.dll COPYONLY)
@@ -65,25 +65,25 @@ if (WIN32)
     configure_file(${AWS_DLL_DIR}/aws-c-sdkutils.dll ${CMAKE_BUILD_DIR}/aws-c-sdkutils.dll COPYONLY)
 endif()
 
-# ensure AWS SDK libraries built by us could be found by find_package
+# Make sure AWS SDK for C++ libraries we've built can be found by find_package.
 set(s2n_DIR "${AWS_CMAKE_DIR}/s2n/cmake")
 set(aws-cpp-sdk-timestream-query_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-query")
 # Timestream-write directory value is needed for data writer tool
 set(aws-cpp-sdk-timestream-write_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-write")
 set(aws-cpp-sdk-sts_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-sts")
 set(aws-cpp-sdk-core_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-core")
-set(aws-crt-cpp_DIR "${AWS_CMAKE_DIR}/aws-crt-cpp/cmake")
-set(aws-c-http_DIR "${AWS_CMAKE_DIR}/aws-c-http/cmake")
-set(aws-c-io_DIR "${AWS_CMAKE_DIR}/aws-c-io/cmake")
-set(aws-c-common_DIR "${AWS_CMAKE_DIR}/aws-c-common/cmake")
-set(aws-c-cal_DIR "${AWS_CMAKE_DIR}/aws-c-cal/cmake")
-set(aws-c-compression_DIR "${AWS_CMAKE_DIR}/aws-c-compression/cmake")
-set(aws-c-auth_DIR "${AWS_CMAKE_DIR}/aws-c-auth/cmake")
-set(aws-c-mqtt_DIR "${AWS_CMAKE_DIR}/aws-c-mqtt/cmake")
-set(aws-checksums_DIR "${AWS_CMAKE_DIR}/aws-checksums/cmake")
-set(aws-c-event-stream_DIR "${AWS_CMAKE_DIR}/aws-c-event-stream/cmake")
-set(aws-c-s3_DIR "${AWS_CMAKE_DIR}/aws-c-s3/cmake")
-set(aws-c-sdkutils_DIR "${AWS_CMAKE_DIR}/aws-c-sdkutils/cmake")
+set(aws-crt-cpp_DIR "${AWS_CMAKE_DIR}/cmake/aws-crt-cpp")
+set(aws-c-http_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-http")
+set(aws-c-io_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-io")
+set(aws-c-common_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-common")
+set(aws-c-cal_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-cal")
+set(aws-c-compression_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-compression")
+set(aws-c-auth_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-auth")
+set(aws-c-mqtt_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-mqtt")
+set(aws-checksums_DIR "${AWS_CMAKE_DIR}/cmake/aws-checksums")
+set(aws-c-event-stream_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-event-stream")
+set(aws-c-s3_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-s3")
+set(aws-c-sdkutils_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-sdkutils")
 set(AWSSDK_DIR "${AWS_CMAKE_DIR}/cmake/AWSSDK")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")

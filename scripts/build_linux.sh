@@ -36,22 +36,24 @@ then
     CMAKE_TOOLCHAIN_FILE="$PROJECT_DIR/src/linux_32bit_toolchain.cmake"
 fi
     
-# build AWS SDK
+# Build the AWS SDK for C++.
+echo "Building the AWS SDK for C++."
 cd src
-git clone --recurse-submodules -b "1.11.80" "https://github.com/aws/aws-sdk-cpp.git"
+git clone --recurse-submodules -b "1.11.663" "https://github.com/aws/aws-sdk-cpp.git"
 cd aws-sdk-cpp
-mkdir install
-mkdir build
+mkdir -p install
+mkdir -p build
 cd build
 cmake ../ -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations" -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE="Release" -DBUILD_ONLY="core;sts;timestream-query;timestream-write" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_TESTING="OFF" -DBUILD_SHARED_LIBS="OFF" -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}"
 make -j 4
 make install
 cd ../../../
 
-# build Timestream ODBC driver
-mkdir $BUILD_DIR
+# Build the Timestream ODBC driver.
+echo "Building the Amazon Timestream ODBC driver."
+mkdir -p $BUILD_DIR
 cd $BUILD_DIR
-cmake ../src -DBITNESS=$1 -DCMAKE_BUILD_TYPE=$2 -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" -DINSTALLER_TYPE=$3
+cmake ../src -DBITNESS=$1 -DCMAKE_BUILD_TYPE=$2 -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" -DINSTALLER_TYPE=$3
 make -j 4
 
 RET_CODE=$?

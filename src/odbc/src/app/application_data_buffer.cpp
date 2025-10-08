@@ -1345,38 +1345,38 @@ T ApplicationDataBuffer::GetNum() const {
 
     case OdbcNativeType::AI_SIGNED_TINYINT: {
       res =
-          static_cast< T >(*reinterpret_cast< const signed char* >(GetData()));
+          static_cast< T >(*reinterpret_cast< const int8_t* >(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_BIT:
     case OdbcNativeType::AI_UNSIGNED_TINYINT: {
       res = static_cast< T >(
-          *reinterpret_cast< const unsigned char* >(GetData()));
+          *reinterpret_cast< const uint8_t* >(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_SIGNED_SHORT: {
       res =
-          static_cast< T >(*reinterpret_cast< const signed short* >(GetData()));
+          static_cast< T >(*reinterpret_cast< const int16_t* >(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_UNSIGNED_SHORT: {
       res = static_cast< T >(
-          *reinterpret_cast< const unsigned short* >(GetData()));
+          *reinterpret_cast< const uint16_t* >(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_SIGNED_LONG: {
       res =
-          static_cast< T >(*reinterpret_cast< const signed long* >(GetData()));
+          static_cast< T >(*reinterpret_cast< const int32_t* >(GetData()));
       break;
     }
 
     case OdbcNativeType::AI_UNSIGNED_LONG: {
       res = static_cast< T >(
-          *reinterpret_cast< const unsigned long* >(GetData()));
+          *reinterpret_cast< const uint32_t* >(GetData()));
       break;
     }
 
@@ -1888,10 +1888,10 @@ SqlLen ApplicationDataBuffer::GetElementSize() const {
       return static_cast< SqlLen >(sizeof(SQLUSMALLINT));
 
     case OdbcNativeType::AI_SIGNED_LONG:
-      return static_cast< SqlLen >(sizeof(SQLUINTEGER));
+      return static_cast< SqlLen >(sizeof(SQLINTEGER));
 
     case OdbcNativeType::AI_UNSIGNED_LONG:
-      return static_cast< SqlLen >(sizeof(SQLINTEGER));
+      return static_cast< SqlLen >(sizeof(SQLUINTEGER));
 
     case OdbcNativeType::AI_FLOAT:
       return static_cast< SqlLen >(sizeof(SQLREAL));

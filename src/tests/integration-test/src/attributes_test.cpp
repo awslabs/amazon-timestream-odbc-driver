@@ -577,8 +577,9 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLExecDirect) {
   ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_NUMBER, &rowNum, 0, 0);
 
 #ifdef __linux__
-  BOOST_REQUIRE_EQUAL("24000: [unixODBC][Driver Manager]Invalid cursor state",
-                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_CHECK("24000: [unixODBC][Driver Manager]Invalid cursor state" ==
+      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) ||
+      "Cannot find ODBC error message" == GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) );
 #elif defined(__APPLE__)
   // iODBC driver manager does not return error message after calling SQLFetch
   // returns SQL_NO_DATA. This behavior is controlled by the driver manager.
@@ -637,8 +638,9 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLTables) {
   ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_NUMBER, &rowNum, 0, 0);
 
 #ifdef __linux__
-  BOOST_REQUIRE_EQUAL("24000: [unixODBC][Driver Manager]Invalid cursor state",
-                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_CHECK("24000: [unixODBC][Driver Manager]Invalid cursor state" ==
+      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) ||
+      "Cannot find ODBC error message" == GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #elif defined(__APPLE__)
   // iODBC driver manager does not return error message after calling SQLFetch
   // returns SQL_NO_DATA. This behavior is controlled by the driver manager.
@@ -696,8 +698,9 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLColumns) {
   ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_NUMBER, &rowNum, 0, 0);
 
 #ifdef __linux__
-  BOOST_REQUIRE_EQUAL("24000: [unixODBC][Driver Manager]Invalid cursor state",
-                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_CHECK("24000: [unixODBC][Driver Manager]Invalid cursor state" ==
+      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) ||
+      "Cannot find ODBC error message" == GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #elif defined(__APPLE__)
   // iODBC driver manager does not return error message after calling SQLFetch
   // returns SQL_NO_DATA. This behavior is controlled by the driver manager.
@@ -746,8 +749,9 @@ BOOST_AUTO_TEST_CASE(StatementAttributeRowNumberSQLGetTypeInfo) {
   ret = SQLGetStmtAttr(stmt, SQL_ATTR_ROW_NUMBER, &rowNum, 0, 0);
 
 #ifdef __linux__
-  BOOST_REQUIRE_EQUAL("24000: [unixODBC][Driver Manager]Invalid cursor state",
-                      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
+  BOOST_CHECK("24000: [unixODBC][Driver Manager]Invalid cursor state" ==
+      GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt) ||
+      "Cannot find ODBC error message" == GetOdbcErrorMessage(SQL_HANDLE_STMT, stmt));
 #elif defined(__APPLE__)
   // iODBC driver manager does not return error message after calling SQLFetch
   // returns SQL_NO_DATA. This behavior is controlled by the driver manager.

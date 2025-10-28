@@ -127,6 +127,7 @@ have all been set correctly:
 ```
            apt-get -y update \
            && apt-get -y install wget \
+                                 cmake \
                                  curl \
                                  libcurl4-openssl-dev \
                                  libssl-dev \
@@ -234,10 +235,8 @@ have all been set correctly:
                                  tar \
                                  rpm                           
 ```
-   2. Install cmake
-   `apt-get install cmake`
 
-   3. Typically, Ubuntu 32-bit uses an old version of CMake, older than 3.20, which is the minimum required version to compile the driver. Follow below steps to build CMake 3.20 (or above) from source. 
+   2. Typically, Ubuntu 32-bit uses an old version of CMake, older than 3.20, which is the minimum required version to compile the driver. Follow below steps to build CMake 3.20 (or above) from source. 
       1. Clone the CMake repository:
          ```
          git clone https://github.com/Kitware/CMake.git
@@ -255,13 +254,13 @@ have all been set correctly:
          ```
          cmake --version
          ```
-   4. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
-   5. Set all necessary environment variables and run the following command to register the ODBC driver. 
+   3. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
+   4. Set all necessary environment variables and run the following command to register the ODBC driver. 
 
       `./scripts/register_driver_unix.sh`
-   6. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
-   7. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
-   8. Once configured, run the tests under repository root folder:
+   5. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
+   6. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
+   7. Once configured, run the tests under repository root folder:
          - Run integration tests: `./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false`.
          - Run unit tests: `./build/odbc/bin/timestream-odbc-unit-tests --catch_system_errors=false`.
 

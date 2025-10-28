@@ -28,7 +28,7 @@ DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 if [[ $2=="DEBUG" ]]
 then
     DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
-    mkdir $DRIVER_LOG_DIR
+    mkdir -p $DRIVER_LOG_DIR
 fi
 
 if [[ $1 -eq 32 ]]

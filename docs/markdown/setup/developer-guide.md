@@ -144,6 +144,7 @@ have all been set correctly:
                                  libsasl2-dev \
                                  lcov \
                                  git \
+                                 odbcinst \
                                  unixodbc-dev \
                                  valgrind \
                                  zip \
@@ -154,7 +155,7 @@ have all been set correctly:
    2. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release64_deb.sh`
    3. Set all necessary environment variables and run the following command to register the ODBC driver. 
 
-      `./scripts/register_driver_unix.sh`
+      `sudo ./scripts/register_driver_unix.sh`
    4. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
    5. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
    6. Once configured, run the tests under the repository root folder:
@@ -257,7 +258,7 @@ have all been set correctly:
    3. Run one of the build scripts to create an initial compilation. E.g. `./build_linux_release32_deb.sh`
    4. Set all necessary environment variables and run the following command to register the ODBC driver. 
 
-      `./scripts/register_driver_unix.sh`
+      `sudo ./scripts/register_driver_unix.sh`
    5. Set environment variables for testing and double-check if all dev environmnet variables are set running `scripts/env_variables_check.sh`.
    6. Now you're ready to begin [configuration for integration and unit testing](#integration-tests).
    7. Once configured, run the tests under repository root folder:

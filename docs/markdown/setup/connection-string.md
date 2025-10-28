@@ -34,7 +34,7 @@
 
 | Option | Description | Default |
 |--------|-------------|---------------|
-| `EndpointOverride` | The endpoint override for the Timestream service. It overrides the region. It is an advanced option. <br /> Example value: <br /> query-cell2.timestream.us-east-1.amazonaws.com | `NONE`
+| `EndpointOverride` | The endpoint override for the Timestream service. It overrides the region. It is an advanced option. <br /> Example value: <br /> https://query-cell2.timestream.us-east-1.amazonaws.com | `NONE`
 | `Region` | The signing region for the Timestream service endpoint. | `us-east-1` 
 
 ### Credentials Provider Options
@@ -164,15 +164,15 @@ driver={Amazon Timestream ODBC Driver};auth=aad;region=us-west-2;idPUsername=myU
 #### Connecting With Specified Endpoint with Log Level Warning
 
 ```
-Driver={Amazon Timestream ODBC Driver};Auth=IAM;AccessKeyId=myAccessKeyId;secretKey=mySecretKey;EndpointOverride=ingest.timestream.us-west-2.amazonaws.com;Region=us-east-2;LogLevel=2;
+Driver={Amazon Timestream ODBC Driver};Auth=IAM;AccessKeyId=myAccessKeyId;secretKey=mySecretKey;EndpointOverride=https://query-cell2.timestream.us-west-2.amazonaws.com;Region=us-east-2;LogLevel=2;
 ```
 
 #### Notes
 
 1. Authentication type (Auth) is AWS IAM credentials.
-2. Endpoint is `ingest.timestream.us-west-2.amazonaws.com`.
-3. Region is `us-east-2`. 
-4. Log lever is set to 2 which is `Warning`.
+2. Endpoint is `https://query-cell2.timestream.us-west-2.amazonaws.com`.
+3. Region is `us-east-2`.
+4. Log level is set to 2, which is `Warning`.
 
 ## Troubleshooting
 

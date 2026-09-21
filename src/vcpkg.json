@@ -1,6 +1,6 @@
 {
+    "builtin-baseline": "9e4b86d4871c47f125e9f631de07d963fcd38389",
     "dependencies": [
-      "aws-sdk-cpp",
       { "name": "aws-sdk-cpp", "features": ["timestream-query", "timestream-write", "sts"] },
       "aws-c-s3",
       "curl",

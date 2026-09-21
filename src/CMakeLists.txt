@@ -63,6 +63,8 @@ if (WIN32)
     configure_file(${AWS_DLL_DIR}/aws-crt-cpp.dll ${CMAKE_BUILD_DIR}/aws-crt-cpp.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-c-s3.dll ${CMAKE_BUILD_DIR}/aws-c-s3.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-c-sdkutils.dll ${CMAKE_BUILD_DIR}/aws-c-sdkutils.dll COPYONLY)
+    # zlib1.dll is a transitive runtime dependency of aws-cpp-sdk-core.dll (vcpkg dynamic triplet).
+    configure_file(${AWS_DLL_DIR}/zlib1.dll ${CMAKE_BUILD_DIR}/zlib1.dll COPYONLY)
 endif()
 
 # Make sure AWS SDK for C++ libraries we've built can be found by find_package.

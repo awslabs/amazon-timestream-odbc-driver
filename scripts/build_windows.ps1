@@ -46,9 +46,6 @@ Set-Location $CURRENT_DIR
 # Move driver dependencies to bin directory for testing
 New-Item -Path $DRIVER_BIN_DIR -ItemType Directory -Force | Out-Null
 
-# Copy over vcpkg dependencies
-Copy-Item $VCPKG_INSTALLED_DIR\bin\* $DRIVER_BIN_DIR
-
 if (Test-Path -Path $DRIVER_BUILD_DIR\$CONFIGURATION) {
     Copy-Item $DRIVER_BUILD_DIR\$CONFIGURATION\* $DRIVER_BIN_DIR -force -recurse
 }

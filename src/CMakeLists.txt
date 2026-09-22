@@ -20,15 +20,18 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 
 # Mac
 if (UNIX AND APPLE)
-    set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+    include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-osx/include)
+    include_directories(/usr/local/iODBC/include)
 endif()
 
 # Linux 
 if (UNIX AND NOT APPLE)
-    if (${INSTALLER_TYPE} STREQUAL "RPM" AND ${BITNESS} EQUAL 64)
-        set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib64)
+    if (${BITNESS} EQUAL 64)
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux)
+        include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include)
     else()
-        set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-linux)
+        include_directories(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-linux/include)
     endif()
 endif()
 
@@ -66,27 +69,6 @@ if (WIN32)
     # zlib1.dll is a transitive runtime dependency of aws-cpp-sdk-core.dll (vcpkg dynamic triplet).
     configure_file(${AWS_DLL_DIR}/zlib1.dll ${CMAKE_BUILD_DIR}/zlib1.dll COPYONLY)
 endif()
-
-# Make sure AWS SDK for C++ libraries we've built can be found by find_package.
-set(s2n_DIR "${AWS_CMAKE_DIR}/s2n/cmake")
-set(aws-cpp-sdk-timestream-query_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-query")
-# Timestream-write directory value is needed for data writer tool
-set(aws-cpp-sdk-timestream-write_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-write")
-set(aws-cpp-sdk-sts_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-sts")
-set(aws-cpp-sdk-core_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-core")
-set(aws-crt-cpp_DIR "${AWS_CMAKE_DIR}/cmake/aws-crt-cpp")
-set(aws-c-http_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-http")
-set(aws-c-io_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-io")
-set(aws-c-common_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-common")
-set(aws-c-cal_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-cal")
-set(aws-c-compression_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-compression")
-set(aws-c-auth_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-auth")
-set(aws-c-mqtt_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-mqtt")
-set(aws-checksums_DIR "${AWS_CMAKE_DIR}/cmake/aws-checksums")
-set(aws-c-event-stream_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-event-stream")
-set(aws-c-s3_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-s3")
-set(aws-c-sdkutils_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-sdkutils")
-set(AWSSDK_DIR "${AWS_CMAKE_DIR}/cmake/AWSSDK")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")

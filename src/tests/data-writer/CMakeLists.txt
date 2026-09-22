@@ -16,6 +16,7 @@ project(timestream-populate-data)
 set(TARGET ${PROJECT_NAME})
 
 find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query timestream-write)
+find_package(aws-cpp-sdk-timestream-query CONFIG REQUIRED)
 if (UNIX)
     find_package(ZLIB REQUIRED)
 endif()

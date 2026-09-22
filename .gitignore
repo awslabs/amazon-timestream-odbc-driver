@@ -17,6 +17,7 @@
 *.mez
 *.xml
 /vcpkg/
+vcpkg_installed/
 # Visual Studio 
 .vs/*
 src/.vs/*

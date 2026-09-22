@@ -47,6 +47,8 @@ Test data are needed for tests to run successfully and they only need to be load
 
 ## Windows
 
+> **Supported toolset:** Build with **Visual Studio 2022 (MSVC v143 toolset)**. This is the toolset used by CI (`windows-2022` runner) and is what released artifacts are built with. Newer Visual Studio versions (e.g. VS 2026 / MSVC v145) are **not currently supported for building**: the vcpkg/CMake version pinned by this project cannot detect the v145 toolset and dependency configuration.
+
 1. Microsoft Visual Studio (Community 2022 Verified)
    1. Desktop Development for C++
    2. Visual Studio core editor
@@ -79,6 +81,26 @@ Test data are needed for tests to run successfully and they only need to be load
 10. Once configured, run the tests:
     - Run integration tests: `.\build\odbc\bin\<Release or Debug>\timestream-odbc-integration-tests.exe`.
     - Run unit tests: `.\build\odbc\bin\<Release or Debug>\timestream-odbc-unit-tests.exe`.
+
+### Windows dependencies
+
+The Windows driver depends on the following DLLs at runtime, which are built by vcpkg and
+included in the MSI installer:
+
+- `timestream.odbc.dll` — the ODBC driver
+- `aws-cpp-sdk-core.dll`, `aws-cpp-sdk-timestream-query.dll`, `aws-cpp-sdk-sts.dll` — AWS SDK
+- `aws-crt-cpp.dll`, `aws-c-auth.dll`, `aws-c-cal.dll`, `aws-c-common.dll`, `aws-c-compression.dll`, `aws-c-event-stream.dll`, `aws-c-http.dll`, `aws-c-io.dll`, `aws-c-mqtt.dll`, `aws-c-s3.dll`, `aws-c-sdkutils.dll`, `aws-checksums.dll` — AWS Common Runtime
+- `zlib1.dll` — a dependency of `aws-cpp-sdk-core.dll`
+
+The dependency set is pinned by `builtin-baseline` in `src/vcpkg.json`. If that baseline changes,
+the required DLLs may change too; confirm the driver's dependencies (e.g. with `dumpbin /dependents`)
+and update the installer accordingly.
+
+When adding or removing a DLL, update all three of these files so they stay consistent:
+
+1. `src/CMakeLists.txt` — copies the DLL next to the driver for local runs and tests.
+2. `src/odbc/CMakeLists.txt` — defines the DLL path and a component ID for each architecture (arm64, x64, x86).
+3. `src/odbc/install/timestream-odbc.wxs.in` — lists the DLL in the installer so it ships in the MSI.
 
 ### Known issues
 Driver installer detects existing driver and isn't allowing installation

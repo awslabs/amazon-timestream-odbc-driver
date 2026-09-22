@@ -112,7 +112,8 @@ BOOST_AUTO_TEST_CASE(TestDriverConnectionWithEndpoint) {
     config.region = "us-west-2";
     config.enableEndpointDiscovery = true;
     Aws::TimestreamQuery::TimestreamQueryClient client(config);
-    auto outcome = client.DescribeEndpoints();
+    auto outcome = client.DescribeEndpoints(
+        Aws::TimestreamQuery::Model::DescribeEndpointsRequest());
     if (!outcome.IsSuccess()) {
       BOOST_FAIL("DescribeEndpoints failed: " + outcome.GetError().GetMessage());
     } else {

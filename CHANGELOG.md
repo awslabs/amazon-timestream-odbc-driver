@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.4](https://github.com/awslabs/amazon-timestream-odbc-driver/releases/tag/v2.1.4) - 2026-09-22
+
+### Fixed
+
+- [Add missing dependencies to installer and fix endpoint discovery bug](https://github.com/awslabs/amazon-timestream-odbc-driver/pull/35).
+
 ## [v2.1.3](https://github.com/awslabs/amazon-timestream-odbc-driver/releases/tag/v2.1.3) - 2025-10-28
 
 ### Fixed

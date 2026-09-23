@@ -8,6 +8,11 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
@@ -40,7 +45,7 @@ env:
 
 jobs:
   build-mac-debug:
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v3
 
@@ -102,6 +107,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -113,7 +119,7 @@ jobs:
 
     - name: upload-unit-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
         check_name: "macOS Monterey 12 Debug Build Unit Test Results Check"
         comment_title: "macOS Monterey 12 Debug Build Unit Test Results"
@@ -124,7 +130,7 @@ jobs:
       run: |
         export DYLD_LIBRARY_PATH=${{env.ODBC_LIB_PATH}}:$DYLD_LIBRARY_PATH
         ./build/odbc/bin/timestream-odbc-integration-tests --catch_system_errors=false
-        gcovr -r .. --exclude-directories=cmake-build64/tests/integration-test/CMakeFiles/timestream-odbc-integration-tests.dir$ --exclude-directories=cmake-build64/tests/unit-test/CMakeFiles/timestream-odbc-unit-tests.dir$ --cobertura --output coverage.cobertura.xml
+        gcovr --gcov-ignore-parse-errors=all -r .. --exclude-directories=cmake-build64/tests/integration-test/CMakeFiles/timestream-odbc-integration-tests.dir$ --exclude-directories=cmake-build64/tests/unit-test/CMakeFiles/timestream-odbc-unit-tests.dir$ --cobertura --output coverage.cobertura.xml
 
     - name: upload-coverage
       if: always()
@@ -135,7 +141,7 @@ jobs:
   
     - name: upload-integration-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v1.30
+      uses: EnricoMi/publish-unit-test-result-action/macos@v2
       with:
         check_name: "macOS Monterey 12 Debug Build Integration Test Results Check"
         comment_title: "macOS Monterey 12 Debug Build Integration Test Results"

@@ -8,6 +8,11 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"
@@ -40,7 +45,7 @@ env:
 
 jobs:
   build-mac:
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
 
@@ -91,6 +96,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-unit-tests

@@ -143,6 +143,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -286,6 +287,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -422,6 +424,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-tests

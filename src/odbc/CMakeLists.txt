@@ -199,7 +199,14 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     set(WIX_ODBC_AWS_CRT_CPP ".\\aws-crt-cpp.dll")
     set(WIX_ODBC_AWS_C_S3 ".\\aws-c-s3.dll")
     set(WIX_ODBC_AWS_C_SDKUTILS ".\\aws-c-sdkutils.dll")
-    set(WIX_ODBC_ZLIB ".\\zlib1.dll")
+    # vcpkg names zlib's debug build zlibd1.dll and release zlib1.dll. The MSI must
+    # package the variant that matches the driver's build type.
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(WIX_ODBC_ZLIB_NAME "zlibd1.dll")
+    else()
+        set(WIX_ODBC_ZLIB_NAME "zlib1.dll")
+    endif()
+    set(WIX_ODBC_ZLIB ".\\${WIX_ODBC_ZLIB_NAME}")
 
     set(WIX_PROJECT_NAME "Amazon Timestream")
     set(WIX_MANUFACTURER "Amazon Web Services")

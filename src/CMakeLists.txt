@@ -38,13 +38,22 @@ endif()
 # Windows
 if (WIN32)
     if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-      set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib)
-      set(AWS_DLL_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin)
-      set(AWS_LIB_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib)
+      set(VCPKG_TRIPLET_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows)
     else()
-      set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib)
-      set(AWS_DLL_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/bin)
-      set(AWS_LIB_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib)
+      set(VCPKG_TRIPLET_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows)
+    endif()
+    # vcpkg installs debug binaries under a separate debug/ subdirectory. A Debug
+    # build must load the debug SDK DLLs (matching /MDd and _ITERATOR_DEBUG_LEVEL=2);
+    # loading the release DLLs into a debug driver causes CRT/STL ABI mismatches and
+    # access violations at runtime.
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(AWS_CMAKE_DIR ${VCPKG_TRIPLET_DIR}/debug/lib)
+      set(AWS_DLL_DIR ${VCPKG_TRIPLET_DIR}/debug/bin)
+      set(AWS_LIB_DIR ${VCPKG_TRIPLET_DIR}/debug/lib)
+    else()
+      set(AWS_CMAKE_DIR ${VCPKG_TRIPLET_DIR}/lib)
+      set(AWS_DLL_DIR ${VCPKG_TRIPLET_DIR}/bin)
+      set(AWS_LIB_DIR ${VCPKG_TRIPLET_DIR}/lib)
     endif()
     set(CMAKE_BUILD_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
@@ -67,7 +76,13 @@ if (WIN32)
     configure_file(${AWS_DLL_DIR}/aws-c-s3.dll ${CMAKE_BUILD_DIR}/aws-c-s3.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-c-sdkutils.dll ${CMAKE_BUILD_DIR}/aws-c-sdkutils.dll COPYONLY)
     # zlib1.dll is a transitive runtime dependency of aws-cpp-sdk-core.dll (vcpkg dynamic triplet).
-    configure_file(${AWS_DLL_DIR}/zlib1.dll ${CMAKE_BUILD_DIR}/zlib1.dll COPYONLY)
+    # vcpkg names the debug build zlibd1.dll and the release build zlib1.dll.
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(ZLIB_DLL_NAME zlibd1.dll)
+    else()
+      set(ZLIB_DLL_NAME zlib1.dll)
+    endif()
+    configure_file(${AWS_DLL_DIR}/${ZLIB_DLL_NAME} ${CMAKE_BUILD_DIR}/${ZLIB_DLL_NAME} COPYONLY)
 endif()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")

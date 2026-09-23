@@ -8,6 +8,11 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
 env:
   CI_OUTPUT_PATH: "ci-output"
   ODBC_LIB_PATH: "${{github.workspace}}/build/odbc/lib"

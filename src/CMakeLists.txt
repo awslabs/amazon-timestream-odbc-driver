@@ -108,6 +108,14 @@ if (MSVC)
     add_compile_options(/source-charset:utf-8 /execution-charset:utf-8)
 
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+
+    # The AWS SDK for C++ is consumed from vcpkg as dynamic libraries (DLLs) on
+    # Windows. USE_IMPORT_EXPORT makes the SDK headers mark symbols as
+    # __declspec(dllimport) so they are resolved from the SDK import libs at link
+    # time instead of being emitted into every translation unit. Without it, SDK
+    # template instantiations/inline methods get baked into timestream-odbc-static.lib
+    # and collide with the SDK import libs (LNK2005 multiply-defined symbols).
+    add_definitions(-DUSE_IMPORT_EXPORT)
 endif()
 
 option (WITH_ODBC OFF)

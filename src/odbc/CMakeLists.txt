@@ -42,7 +42,7 @@ if (${CODE_COVERAGE})
     add_code_coverage()    
 endif()
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${AWSSDK_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 include_directories(include)
 
@@ -151,7 +151,6 @@ set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
 target_link_libraries(${TARGET} aws-cpp-sdk-core aws-cpp-sdk-timestream-query aws-cpp-sdk-sts)
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${AWSSDK_LINK_LIBRARIES})
 
 add_definitions(-DUNICODE=1)
 add_definitions(-DPROJECT_VERSION=${CMAKE_PROJECT_VERSION})

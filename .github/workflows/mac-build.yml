@@ -49,6 +49,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    # Pin a Python with prebuilt lxml wheels. macos-14 defaults to Python 3.14,
+    # for which lxml has no wheel, causing the publish-test-results action to
+    # hang building lxml from source.
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
     - name: run-cppcheck
       run: |
         brew install cppcheck

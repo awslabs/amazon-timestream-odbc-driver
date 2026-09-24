@@ -49,6 +49,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    # Pin a Python with prebuilt lxml wheels. macos-14 defaults to Python 3.14,
+    # for which lxml has no wheel, causing the publish-test-results action to
+    # hang building lxml from source.
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
     - name: run-cppcheck
       run: |
         brew install cppcheck
@@ -67,7 +74,7 @@ jobs:
         brew install libiodbc
         brew link --overwrite --force libiodbc
         brew install boost
-        pip3 install gcovr
+        brew install gcovr
 
 # If action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
 # recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors will occur

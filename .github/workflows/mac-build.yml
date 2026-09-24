@@ -1,12 +1,14 @@
 name: ODBC Driver for Mac
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  # TEMP: auto-triggers disabled to focus CI on the macOS debug build. Restore before merge.
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
 
 permissions:
   checks: write
@@ -78,11 +80,15 @@ jobs:
         sudo mkdir -p /usr/local/lib
         sudo ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
 
-    # Select a complete Xcode SDK so the compiler has a valid sysroot (system
-    # headers like <sys/types.h> resolve when building openssl via vcpkg).
-    - name: select-xcode
+    # Provide an explicit SDK sysroot for every compiler invocation (fixes
+    # '<sys/types.h> file not found' when vcpkg builds openssl with a cached
+    # CommandLineTools compiler that resolves to an incomplete SDK).
+    - name: setup-macos-sdk
       run: |
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        echo "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer" >> $GITHUB_ENV
+        echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> $GITHUB_ENV
+        rm -rf "$VCPKG_INSTALLATION_ROOT/buildtrees/detect_compiler" 2>/dev/null || true
         xcrun --sdk macosx --show-sdk-path
 
     - name: configure-and-build-driver

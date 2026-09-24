@@ -90,12 +90,18 @@ jobs:
         echo "/opt/homebrew/bin" >> $GITHUB_PATH
         echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
 
-    # Select a complete Xcode SDK so the compiler has a valid sysroot. Without
-    # this, the runner's default developer dir can leave `cc` without an SDK and
-    # system headers like <sys/types.h> are not found when building openssl.
-    - name: select-xcode
+    # Provide an explicit SDK sysroot for every compiler invocation. vcpkg caches
+    # its detected compiler (CommandLineTools cc), which on the runner can resolve
+    # to a broken/incomplete SDK, causing '<sys/types.h> file not found' when
+    # building openssl. Setting DEVELOPER_DIR + SDKROOT forces a valid sysroot
+    # regardless of the cached compiler. Also clear vcpkg's compiler-detection
+    # cache so it re-detects with the corrected environment.
+    - name: setup-macos-sdk
       run: |
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        echo "DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer" >> $GITHUB_ENV
+        echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> $GITHUB_ENV
+        rm -rf "$VCPKG_INSTALLATION_ROOT/buildtrees/detect_compiler" 2>/dev/null || true
         xcrun --sdk macosx --show-sdk-path
 
     - name: configure-and-build-driver

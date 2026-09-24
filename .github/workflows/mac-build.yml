@@ -74,8 +74,9 @@ jobs:
         brew install libiodbc
         brew link --overwrite --force libiodbc
         brew install boost
-        # Expose libiodbc under the expected libodbc.2.dylib name (Homebrew arm64 path).
-        ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /opt/homebrew/lib/libodbc.2.dylib
+        # Expose iODBC under the expected libodbc.2.dylib name (matches working local setup).
+        sudo mkdir -p /usr/local/lib
+        sudo ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
 
     - name: configure-and-build-driver
       run: |

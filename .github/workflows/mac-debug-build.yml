@@ -75,11 +75,10 @@ jobs:
         brew link --overwrite --force libiodbc
         brew install boost
         brew install gcovr
-        # LLVM (llvm-cov) is required for the debug/coverage build. Use Homebrew
-        # (/opt/homebrew) paths for the arm64 runner.
-        brew install llvm
-        ln -sf /opt/homebrew/opt/llvm/bin/llvm-cov /opt/homebrew/bin/llvm-cov
-        ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /opt/homebrew/lib/libodbc.2.dylib
+        # Expose iODBC under the expected libodbc.2.dylib name (matches working
+        # local setup). Ensure target dirs exist.
+        sudo mkdir -p /usr/local/lib
+        sudo ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
 
 # Per the developer guide, the debug build requires LLVM and the XCode
 # CommandLineTools toolchain must come FIRST in PATH. $GITHUB_PATH prepends each
@@ -94,6 +93,19 @@ jobs:
     - name: configure-and-build-driver
       run: |
         ./build_mac_debug64.sh
+
+    - name: dump-openssl-log-on-failure
+      if: failure()
+      run: |
+        echo "===== build-arm64-osx-dbg-err.log ====="
+        cat /usr/local/share/vcpkg/buildtrees/openssl/build-arm64-osx-dbg-err.log || true
+        echo "===== build-arm64-osx-dbg-out.log (tail) ====="
+        tail -80 /usr/local/share/vcpkg/buildtrees/openssl/build-arm64-osx-dbg-out.log || true
+        echo "===== disk usage ====="
+        df -h
+        echo "===== vcpkg version / root ====="
+        which vcpkg && vcpkg version || true
+        echo "VCPKG_INSTALLATION_ROOT=$VCPKG_INSTALLATION_ROOT"
 
     - name: update-environment-with-ODBC_DRIVER_VERSION
       run: |

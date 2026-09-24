@@ -20,6 +20,13 @@ if [[ $(uname -m) =~ ^arm.* || $(uname -m) == 'aarch64' ]]; then
   VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
 fi
 
+# VCPKG_ROOT is set for local developer setups (see developer guide). GitHub
+# runners instead expose the preinstalled vcpkg via VCPKG_INSTALLATION_ROOT, so
+# fall back to that when VCPKG_ROOT is not already set.
+if [[ -z "${VCPKG_ROOT}" ]]; then
+  VCPKG_ROOT="${VCPKG_INSTALLATION_ROOT}"
+fi
+
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Release
 PROJECT_DIR=$(pwd)

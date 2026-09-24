@@ -20,13 +20,6 @@ if [[ $(uname -m) =~ ^arm.* || $(uname -m) == 'aarch64' ]]; then
   VCPKG_INSTALLED_DIR='src/vcpkg_installed/arm64-osx'
 fi
 
-# VCPKG_ROOT is set for local developer setups (see developer guide). GitHub
-# runners instead expose the preinstalled vcpkg via VCPKG_INSTALLATION_ROOT, so
-# fall back to that when VCPKG_ROOT is not already set.
-if [[ -z "${VCPKG_ROOT}" ]]; then
-  VCPKG_ROOT="${VCPKG_INSTALLATION_ROOT}"
-fi
-
 BUILD_DIR=cmake-build64
 BUILD_TYPE=Debug
 PROJECT_DIR=$(pwd)
@@ -35,7 +28,7 @@ mkdir -p $PROJECT_DIR/build/odbc/logs
 
 mkdir $BUILD_DIR
 cd $BUILD_DIR
-cmake ../src -DCMAKE_INSTALL_PREFIX="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+cmake ../src -DCMAKE_INSTALL_PREFIX="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON"
 make -j 4
 
 RET_CODE=$?

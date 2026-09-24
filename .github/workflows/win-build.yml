@@ -1,7 +1,6 @@
 name: ODBC Driver for Windows
 
 on:
-  # TEMP: push/pull_request auto-triggers disabled to focus CI on macOS jobs. Restore before merge.
   workflow_dispatch:
     inputs:
       sign:
@@ -9,12 +8,12 @@ on:
         required: true
         default: true
         type: boolean
-  # push:
-  #   branches:
-  #     - main
-  # pull_request:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   checks: write

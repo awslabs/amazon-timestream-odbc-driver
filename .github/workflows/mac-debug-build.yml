@@ -80,22 +80,12 @@ jobs:
         sudo mkdir -p /usr/local/lib
         sudo ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
 
-# Per the developer guide, the debug build requires LLVM and the XCode
-# CommandLineTools toolchain must come FIRST in PATH. $GITHUB_PATH prepends each
-# entry (addPath always prepends), so the XCode path is written LAST to give it
-# the highest priority.
     - name: set-PATH
       run: |
         echo "/usr/local/bin/" >> $GITHUB_PATH
         echo "/opt/homebrew/bin" >> $GITHUB_PATH
         echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
 
-    # Provide an explicit SDK sysroot for every compiler invocation. vcpkg caches
-    # its detected compiler (CommandLineTools cc), which on the runner can resolve
-    # to a broken/incomplete SDK, causing '<sys/types.h> file not found' when
-    # building openssl. Setting DEVELOPER_DIR + SDKROOT forces a valid sysroot
-    # regardless of the cached compiler. Also clear vcpkg's compiler-detection
-    # cache so it re-detects with the corrected environment.
     - name: setup-macos-sdk
       run: |
         sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
@@ -107,19 +97,6 @@ jobs:
     - name: configure-and-build-driver
       run: |
         ./build_mac_debug64.sh
-
-    - name: dump-openssl-log-on-failure
-      if: failure()
-      run: |
-        echo "===== build-arm64-osx-dbg-err.log ====="
-        cat /usr/local/share/vcpkg/buildtrees/openssl/build-arm64-osx-dbg-err.log || true
-        echo "===== build-arm64-osx-dbg-out.log (tail) ====="
-        tail -80 /usr/local/share/vcpkg/buildtrees/openssl/build-arm64-osx-dbg-out.log || true
-        echo "===== disk usage ====="
-        df -h
-        echo "===== vcpkg version / root ====="
-        which vcpkg && vcpkg version || true
-        echo "VCPKG_INSTALLATION_ROOT=$VCPKG_INSTALLATION_ROOT"
 
     - name: update-environment-with-ODBC_DRIVER_VERSION
       run: |

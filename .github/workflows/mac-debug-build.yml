@@ -62,10 +62,10 @@ jobs:
 
     - name: get-dependencies
       run: |
-        brew unlink unixodbc
+        brew install cmake automake autoconf autoconf-archive libtool
+        brew list unixodbc &>/dev/null && brew unlink unixodbc || true
         brew install libiodbc
         brew link --overwrite --force libiodbc
-        brew install cmake
         brew install boost
         pip3 install gcovr
 
@@ -74,6 +74,7 @@ jobs:
     - name: set-PATH
       run: |
         echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
+        echo "/opt/homebrew/bin" >> $GITHUB_PATH
         echo "/usr/local/bin/" >> $GITHUB_PATH
 
     - name: configure-and-build-driver

@@ -1,12 +1,14 @@
 name: ODBC Driver for Linux
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  # TEMP: auto-triggers disabled to focus CI on macOS jobs. Restore before merge.
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
 
 permissions:
   checks: write

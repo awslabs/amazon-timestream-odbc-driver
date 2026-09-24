@@ -21,7 +21,24 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 # Mac
 if (UNIX AND APPLE)
     include_directories(${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-osx/include)
-    include_directories(/usr/local/iODBC/include)
+
+    # Locate the libiodbc headers via the Homebrew prefix so the build works on
+    # both Apple Silicon (/opt/homebrew) and Intel (/usr/local) hosts. Fall back
+    # to the legacy /usr/local/iODBC path if brew is unavailable.
+    find_program(BREW_EXECUTABLE brew)
+    if (BREW_EXECUTABLE)
+        execute_process(
+            COMMAND ${BREW_EXECUTABLE} --prefix libiodbc
+            OUTPUT_VARIABLE LIBIODBC_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET)
+    endif()
+    if (LIBIODBC_PREFIX)
+        include_directories(${LIBIODBC_PREFIX}/include)
+        link_directories(${LIBIODBC_PREFIX}/lib)
+    else()
+        include_directories(/usr/local/iODBC/include)
+    endif()
 endif()
 
 # Linux 

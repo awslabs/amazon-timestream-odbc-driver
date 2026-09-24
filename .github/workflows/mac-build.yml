@@ -62,10 +62,10 @@ jobs:
 
     - name: get-dependencies
       run: |
-        brew unlink unixodbc
+        brew install cmake automake autoconf autoconf-archive libtool
+        brew list unixodbc &>/dev/null && brew unlink unixodbc || true
         brew install libiodbc
         brew link --overwrite --force libiodbc
-        brew install cmake
         brew install boost
 
     - name: configure-and-build-driver

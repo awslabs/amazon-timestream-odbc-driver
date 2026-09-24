@@ -75,14 +75,21 @@ jobs:
         brew link --overwrite --force libiodbc
         brew install boost
         brew install gcovr
+        # LLVM (llvm-cov) is required for the debug/coverage build. Use Homebrew
+        # (/opt/homebrew) paths for the arm64 runner.
+        brew install llvm
+        ln -sf /opt/homebrew/opt/llvm/bin/llvm-cov /opt/homebrew/bin/llvm-cov
+        ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /opt/homebrew/lib/libodbc.2.dylib
 
-# If action `EnricoMi/publish-unit-test-result-action/composite@v1.30`
-# recognizes Python in Library/Developer/CommandLineTools instead of in /usr/local/bin/, then errors will occur
+# Per the developer guide, the debug build requires LLVM and the XCode
+# CommandLineTools toolchain must come FIRST in PATH. $GITHUB_PATH prepends each
+# entry (addPath always prepends), so the XCode path is written LAST to give it
+# the highest priority.
     - name: set-PATH
       run: |
-        echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
-        echo "/opt/homebrew/bin" >> $GITHUB_PATH
         echo "/usr/local/bin/" >> $GITHUB_PATH
+        echo "/opt/homebrew/bin" >> $GITHUB_PATH
+        echo "/Library/Developer/CommandLineTools/usr/bin" >> $GITHUB_PATH
 
     - name: configure-and-build-driver
       run: |

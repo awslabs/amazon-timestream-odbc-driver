@@ -78,6 +78,13 @@ jobs:
         sudo mkdir -p /usr/local/lib
         sudo ln -sf /opt/homebrew/opt/libiodbc/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
 
+    # Select a complete Xcode SDK so the compiler has a valid sysroot (system
+    # headers like <sys/types.h> resolve when building openssl via vcpkg).
+    - name: select-xcode
+      run: |
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        xcrun --sdk macosx --show-sdk-path
+
     - name: configure-and-build-driver
       run: |
         ./build_mac_release64.sh

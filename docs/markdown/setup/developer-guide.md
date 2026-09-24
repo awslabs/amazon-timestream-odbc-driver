@@ -124,13 +124,11 @@ Driver installer detects existing driver and isn't allowing installation
    b. `brew install libiodbc`
       - You may need to unlink `unixodbc` if you already have this installed. Use `brew unlink unixodbc`.
       - You may need to run `brew link --overwrite --force libiodbc`.
-      - ln -s /opt/homebrew/opt/llvm/bin/llvm-cov /usr/local/bin/llvm-cov
-      - ln -s /usr/local/iODBC/lib/libiodbc.dylib /usr/local/lib/libodbc.2.dylib
+      - `libiodbc` is keg-only; expose it under the expected name: `sudo ln -sf "$(brew --prefix libiodbc)/lib/libiodbc.dylib" /usr/local/lib/libodbc.2.dylib`
    c. `brew install boost`
-   d. If creating a debug build (`./build_mac_debug64.sh`), LLVM is required.
-      - If you only have XCode Command Line Tools, use the LLVM included with XCode by modifying the PATH with `export PATH=/Library/Developer/CommandLineTools/usr/bin/:$PATH`. Ensure this XCode path comes first in $PATH. If error occurs, check that clang and llvm are under folder Library/Developer/CommandLineTools/usr/bin.
-      - If you have XCode application, to ensure LLVM and CMake are compatible, use the LLVM included with XCode by modifying the PATH with `export PATH=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/:$PATH`.
-   e. Install iODBC Manager: [iodbcWiki/Downloads](https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads)
+   d. Select a valid SDK so the compiler has a sysroot (else builds fail with `'sys/types.h' file not found`): `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`
+   e. For a debug build (`./build_mac_debug64.sh`), `llvm-cov` is required for coverage (`which llvm-cov`; from Command Line Tools or `brew install llvm`). Ensure Apple `clang` wins in `PATH`, not Homebrew's, so the compiler and SDK match.
+   f. Install iODBC Manager: [iodbcWiki/Downloads](https://www.iodbc.org/dataspace/doc/iodbc/wiki/iodbcWiki/Downloads)
 2. Run one of the build scripts to create an initial compilation.
    a. E.g.: from the root of the Timestream ODBC repository, run `./build_mac_release64.sh`
    b. The generated driver files will be placed in the `build/odbc/lib` folder.

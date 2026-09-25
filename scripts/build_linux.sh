@@ -24,12 +24,16 @@ BUILD_DIR=cmake-build"$1"
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 
-VCPKG_INSTALLED_DIR='src/vcpkg_installed/x86-linux'
-if [[ $(uname -m) == 'x86_64' ]]; then
-  VCPKG_INSTALLED_DIR='src/vcpkg_installed/x64-linux'
+# Choose the vcpkg triplet from the requested bitness ($1), not the host arch,
+# so the installed dependencies match the BITNESS passed to CMake below.
+if [[ $1 -eq 32 ]]; then
+  VCPKG_TRIPLET=x86-linux
+else
+  VCPKG_TRIPLET=x64-linux
 fi
+VCPKG_INSTALLED_DIR="src/vcpkg_installed/$VCPKG_TRIPLET"
 
-if [[ $2=="DEBUG" ]]; then
+if [[ "$2" == "DEBUG" ]]; then
   DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
   mkdir -p $DRIVER_LOG_DIR
 fi
@@ -40,14 +44,14 @@ fi
 
 # Install VCPKG dependencies
 cd src
-vcpkg install
+vcpkg install --triplet "$VCPKG_TRIPLET"
 cd ..
 
 # Build the Timestream ODBC driver.
 echo "Building the Amazon Timestream ODBC driver."
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
-cmake ../src -DCMAKE_INSTALL_PREFIX="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DBITNESS=$1 -DCMAKE_BUILD_TYPE=$2 -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" -DINSTALLER_TYPE=$3
+cmake ../src -DCMAKE_PREFIX_PATH="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DBITNESS=$1 -DCMAKE_BUILD_TYPE=$2 -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" -DINSTALLER_TYPE=$3
 make -j 4
 
 RET_CODE=$?

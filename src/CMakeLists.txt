@@ -20,7 +20,8 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 
 # Mac
 if (UNIX AND APPLE)
-    include_directories(${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-osx/include)
+    # AWS SDK headers are provided by find_package (via CMAKE_PREFIX_PATH), so no
+    # explicit vcpkg include dir is needed here.
 
     # Locate the libiodbc headers via the Homebrew prefix so the build works on
     # both Apple Silicon (/opt/homebrew) and Intel (/usr/local) hosts. Fall back

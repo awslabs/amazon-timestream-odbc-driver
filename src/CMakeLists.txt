@@ -115,15 +115,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIGNITE_IMPL -DIGNITE_FRIEND -D__STDC_L
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# Use a portable, relocatable install RPATH rather than one derived from
+# CMAKE_INSTALL_PREFIX. CMAKE_INSTALL_PREFIX is pointed at the vcpkg tree to help
+# find_package locate dependencies, so deriving the RPATH from it would bake the
+# build machine's (e.g. CI workspace) path into shipped packages. Disabling
+# USE_LINK_PATH also prevents vcpkg lib directories from leaking into the RPATH.
+if (APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path;@loader_path/../lib")
+else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/../lib")
+endif()
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
-
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-
-if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
 
 add_definitions(-DUNICODE=1)
 if (WIN32)

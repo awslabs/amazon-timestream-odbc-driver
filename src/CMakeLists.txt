@@ -20,28 +20,58 @@ project(Timestream-ODBC VERSION ${ODBC_DRIVER_VERSION})
 
 # Mac
 if (UNIX AND APPLE)
-    set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+    # AWS SDK headers are provided by find_package (via CMAKE_PREFIX_PATH), so no
+    # explicit vcpkg include dir is needed here.
+
+    # Locate the libiodbc headers via the Homebrew prefix so the build works on
+    # both Apple Silicon (/opt/homebrew) and Intel (/usr/local) hosts. Fall back
+    # to the legacy /usr/local/iODBC path if brew is unavailable.
+    find_program(BREW_EXECUTABLE brew)
+    if (BREW_EXECUTABLE)
+        execute_process(
+            COMMAND ${BREW_EXECUTABLE} --prefix libiodbc
+            OUTPUT_VARIABLE LIBIODBC_PREFIX
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET)
+    endif()
+    if (LIBIODBC_PREFIX)
+        include_directories(${LIBIODBC_PREFIX}/include)
+        link_directories(${LIBIODBC_PREFIX}/lib)
+    else()
+        include_directories(/usr/local/iODBC/include)
+    endif()
 endif()
 
 # Linux 
 if (UNIX AND NOT APPLE)
-    if (${INSTALLER_TYPE} STREQUAL "RPM" AND ${BITNESS} EQUAL 64)
-        set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib64)
+    if (${BITNESS} EQUAL 64)
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux)
+        include_directories(${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-linux/include)
     else()
-        set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/aws-sdk-cpp/install/lib)
+        set(OPENSSL_ROOT_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-linux)
+        include_directories(${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-linux/include)
     endif()
 endif()
 
 # Windows
 if (WIN32)
     if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-      set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib)
-      set(AWS_DLL_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin)
-      set(AWS_LIB_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib)
+      set(VCPKG_TRIPLET_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows)
     else()
-      set(AWS_CMAKE_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib)
-      set(AWS_DLL_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/bin)
-      set(AWS_LIB_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows/lib)
+      set(VCPKG_TRIPLET_DIR ${CMAKE_SOURCE_DIR}/vcpkg_installed/x86-windows)
+    endif()
+    # vcpkg installs debug binaries under a separate debug/ subdirectory. A Debug
+    # build must load the debug SDK DLLs (matching /MDd and _ITERATOR_DEBUG_LEVEL=2);
+    # loading the release DLLs into a debug driver causes CRT/STL ABI mismatches and
+    # access violations at runtime.
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(AWS_CMAKE_DIR ${VCPKG_TRIPLET_DIR}/debug/lib)
+      set(AWS_DLL_DIR ${VCPKG_TRIPLET_DIR}/debug/bin)
+      set(AWS_LIB_DIR ${VCPKG_TRIPLET_DIR}/debug/lib)
+    else()
+      set(AWS_CMAKE_DIR ${VCPKG_TRIPLET_DIR}/lib)
+      set(AWS_DLL_DIR ${VCPKG_TRIPLET_DIR}/bin)
+      set(AWS_LIB_DIR ${VCPKG_TRIPLET_DIR}/lib)
     endif()
     set(CMAKE_BUILD_DIR ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
@@ -64,29 +94,14 @@ if (WIN32)
     configure_file(${AWS_DLL_DIR}/aws-c-s3.dll ${CMAKE_BUILD_DIR}/aws-c-s3.dll COPYONLY)
     configure_file(${AWS_DLL_DIR}/aws-c-sdkutils.dll ${CMAKE_BUILD_DIR}/aws-c-sdkutils.dll COPYONLY)
     # zlib1.dll is a transitive runtime dependency of aws-cpp-sdk-core.dll (vcpkg dynamic triplet).
-    configure_file(${AWS_DLL_DIR}/zlib1.dll ${CMAKE_BUILD_DIR}/zlib1.dll COPYONLY)
+    # vcpkg names the debug build zlibd1.dll and the release build zlib1.dll.
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+      set(ZLIB_DLL_NAME zlibd1.dll)
+    else()
+      set(ZLIB_DLL_NAME zlib1.dll)
+    endif()
+    configure_file(${AWS_DLL_DIR}/${ZLIB_DLL_NAME} ${CMAKE_BUILD_DIR}/${ZLIB_DLL_NAME} COPYONLY)
 endif()
-
-# Make sure AWS SDK for C++ libraries we've built can be found by find_package.
-set(s2n_DIR "${AWS_CMAKE_DIR}/s2n/cmake")
-set(aws-cpp-sdk-timestream-query_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-query")
-# Timestream-write directory value is needed for data writer tool
-set(aws-cpp-sdk-timestream-write_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-timestream-write")
-set(aws-cpp-sdk-sts_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-sts")
-set(aws-cpp-sdk-core_DIR "${AWS_CMAKE_DIR}/cmake/aws-cpp-sdk-core")
-set(aws-crt-cpp_DIR "${AWS_CMAKE_DIR}/cmake/aws-crt-cpp")
-set(aws-c-http_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-http")
-set(aws-c-io_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-io")
-set(aws-c-common_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-common")
-set(aws-c-cal_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-cal")
-set(aws-c-compression_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-compression")
-set(aws-c-auth_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-auth")
-set(aws-c-mqtt_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-mqtt")
-set(aws-checksums_DIR "${AWS_CMAKE_DIR}/cmake/aws-checksums")
-set(aws-c-event-stream_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-event-stream")
-set(aws-c-s3_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-s3")
-set(aws-c-sdkutils_DIR "${AWS_CMAKE_DIR}/cmake/aws-c-sdkutils")
-set(AWSSDK_DIR "${AWS_CMAKE_DIR}/cmake/AWSSDK")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/modules/code-coverage.cmake")
 if (NOT "$ENV{BOOST_ROOT}" STREQUAL "")
@@ -100,15 +115,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DIGNITE_IMPL -DIGNITE_FRIEND -D__STDC_L
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+# Use a portable, relocatable install RPATH rather than one derived from
+# CMAKE_INSTALL_PREFIX. CMAKE_INSTALL_PREFIX is pointed at the vcpkg tree to help
+# find_package locate dependencies, so deriving the RPATH from it would bake the
+# build machine's (e.g. CI workspace) path into shipped packages. Disabling
+# USE_LINK_PATH also prevents vcpkg lib directories from leaking into the RPATH.
+if (APPLE)
+    set(CMAKE_INSTALL_RPATH "@loader_path;@loader_path/../lib")
+else()
+    set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/../lib")
+endif()
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/..")
-
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-
-if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
 
 add_definitions(-DUNICODE=1)
 if (WIN32)
@@ -126,6 +144,14 @@ if (MSVC)
     add_compile_options(/source-charset:utf-8 /execution-charset:utf-8)
 
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS)
+
+    # The AWS SDK for C++ is consumed from vcpkg as dynamic libraries (DLLs) on
+    # Windows. USE_IMPORT_EXPORT makes the SDK headers mark symbols as
+    # __declspec(dllimport) so they are resolved from the SDK import libs at link
+    # time instead of being emitted into every translation unit. Without it, SDK
+    # template instantiations/inline methods get baked into timestream-odbc-static.lib
+    # and collide with the SDK import libs (LNK2005 multiply-defined symbols).
+    add_definitions(-DUSE_IMPORT_EXPORT)
 endif()
 
 option (WITH_ODBC OFF)

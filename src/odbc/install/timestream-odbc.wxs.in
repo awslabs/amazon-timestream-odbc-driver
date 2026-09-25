@@ -88,7 +88,7 @@
                 <File Id='aws_c_sdkutils' Name='aws-c-sdkutils.dll' DiskId='1' Source='@WIX_ODBC_AWS_C_SDKUTILS@' KeyPath='yes'/>
             </Component>
 	    <Component Id='zlib' Guid='@WIX_COMPONENT_ID_ZLIB@' Win64='@WIX_COMPONENT_IS_WIN64@'>
-                <File Id='zlib' Name='zlib1.dll' DiskId='1' Source='@WIX_ODBC_ZLIB@' KeyPath='yes'/>
+                <File Id='zlib' Name='@WIX_ODBC_ZLIB_NAME@' DiskId='1' Source='@WIX_ODBC_ZLIB@' KeyPath='yes'/>
             </Component>
         </Directory>
 

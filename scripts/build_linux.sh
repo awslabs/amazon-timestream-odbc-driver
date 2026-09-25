@@ -14,53 +14,51 @@
 # permissions and limitations under the License.
 
 Usage="Usage: $0 <32|64> <DEBUG|RELEASE> <DEB|RPM>"
-if [[ $# -ne 3 ]]
-then
-    echo "Invalid parameters"
-    echo $Usage
-    exit 1
+if [[ $# -ne 3 ]]; then
+  echo "Invalid parameters"
+  echo $Usage
+  exit 1
 fi
 
 BUILD_DIR=cmake-build"$1"
 PROJECT_DIR=$(pwd)
 DRIVER_BIN_DIR="$PROJECT_DIR/build/odbc/bin"
 
-if [[ $2=="DEBUG" ]]
-then
-    DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
-    mkdir -p $DRIVER_LOG_DIR
+# Choose the vcpkg triplet from the requested bitness ($1), not the host arch,
+# so the installed dependencies match the BITNESS passed to CMake below.
+if [[ $1 -eq 32 ]]; then
+  VCPKG_TRIPLET=x86-linux
+else
+  VCPKG_TRIPLET=x64-linux
+fi
+VCPKG_INSTALLED_DIR="src/vcpkg_installed/$VCPKG_TRIPLET"
+
+if [[ "$2" == "DEBUG" ]]; then
+  DRIVER_LOG_DIR="$PROJECT_DIR/build/odbc/logs"
+  mkdir -p $DRIVER_LOG_DIR
 fi
 
-if [[ $1 -eq 32 ]]
-then
-    CMAKE_TOOLCHAIN_FILE="$PROJECT_DIR/src/linux_32bit_toolchain.cmake"
+if [[ $1 -eq 32 ]]; then
+  CMAKE_TOOLCHAIN_FILE="$PROJECT_DIR/src/linux_32bit_toolchain.cmake"
 fi
-    
-# Build the AWS SDK for C++.
-echo "Building the AWS SDK for C++."
+
+# Install VCPKG dependencies
 cd src
-git clone --recurse-submodules -b "1.11.663" "https://github.com/aws/aws-sdk-cpp.git"
-cd aws-sdk-cpp
-mkdir -p install
-mkdir -p build
-cd build
-cmake ../ -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations" -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE="Release" -DBUILD_ONLY="core;sts;timestream-query;timestream-write" -DCUSTOM_MEMORY_MANAGEMENT="OFF" -DENABLE_TESTING="OFF" -DBUILD_SHARED_LIBS="OFF" -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}"
-make -j 4
-make install
-cd ../../../
+vcpkg install --triplet "$VCPKG_TRIPLET"
+cd ..
 
 # Build the Timestream ODBC driver.
 echo "Building the Amazon Timestream ODBC driver."
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
-cmake ../src -DBITNESS=$1 -DCMAKE_BUILD_TYPE=$2 -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE}" -DINSTALLER_TYPE=$3
+cmake ../src -DCMAKE_INSTALL_PREFIX="${PROJECT_DIR}/${VCPKG_INSTALLED_DIR}" -DBITNESS=$1 -DCMAKE_BUILD_TYPE=$2 -DCODE_COVERAGE="ON" -DBUILD_SHARED_LIBS="OFF" -DWITH_TESTS="ON" -DWITH_ODBC="ON" -DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE" -DINSTALLER_TYPE=$3
 make -j 4
 
 RET_CODE=$?
 
 if [ $RET_CODE -ne 0 ]; then
-   echo "Error occurred while building project. Exiting."
-   exit $RET_CODE
+  echo "Error occurred while building project. Exiting."
+  exit $RET_CODE
 fi
 
 make package
@@ -68,10 +66,10 @@ make package
 RET_CODE=$?
 
 if [ $RET_CODE -ne 0 ]; then
-   echo "Error occurred while building package. Exiting."
-   exit $RET_CODE
+  echo "Error occurred while building package. Exiting."
+  exit $RET_CODE
 fi
 
-LOWER_CASE_SUFFIX=$(echo $3| tr '[:upper:]' '[:lower:]')
+LOWER_CASE_SUFFIX=$(echo $3 | tr '[:upper:]' '[:lower:]')
 cp *.${LOWER_CASE_SUFFIX} $DRIVER_BIN_DIR
 cd ..

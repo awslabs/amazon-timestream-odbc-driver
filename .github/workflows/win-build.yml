@@ -15,6 +15,11 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+  pull-requests: write
+  contents: read
+
 env:
   SIGNING_ENABLED: ${{ github.event.inputs.sign }}
   CI_OUTPUT_PATH: "ci-output"
@@ -138,6 +143,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -148,7 +154,7 @@ jobs:
 
     - name: upload-unit-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       with:
         check_name: "Windows x32 Build Unit Test Results Check"
         comment_title: "Windows 2022 (x32) Build Unit Test Results"
@@ -170,7 +176,7 @@ jobs:
 
     - name: upload-integration-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       with:
         check_name: "Windows x32 Build Integration Test Results Check"
         comment_title: "Windows 2022 (x32) Build Integration Test Results"
@@ -281,6 +287,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-unit-tests
@@ -291,7 +298,7 @@ jobs:
 
     - name: upload-unit-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       with:
         check_name: "Windows 2022 (x64) Build Unit Test Results Check"
         comment_title: "Windows 2022 (x64) Build Unit Test Results"
@@ -313,7 +320,7 @@ jobs:
 
     - name: upload-integration-test-report
       if: always()
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2.7.0
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       with:
         check_name: "Windows 2022 (x64) Build Integration Test Results Check"
         comment_title: "Windows 2022 (x64) Build Integration Test Results"
@@ -417,6 +424,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IT_TEST_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IT_TEST_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_IT_TEST_SESSION_TOKEN }}
         aws-region: us-west-2
 
     - name: run-tests

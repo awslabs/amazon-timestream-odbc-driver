@@ -28,8 +28,11 @@ include(CPackComponent)
 
 message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 
+
+find_package(aws-cpp-sdk-sts CONFIG REQUIRED)
+find_package(aws-cpp-sdk-timestream-query CONFIG REQUIRED)
+
 find_package(ODBC REQUIRED)
-find_package(AWSSDK REQUIRED COMPONENTS core sts timestream-query)
 find_package(Boost REQUIRED)
 if (UNIX)
     find_package(ZLIB REQUIRED)
@@ -39,7 +42,7 @@ if (${CODE_COVERAGE})
     add_code_coverage()    
 endif()
 
-include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${AWSSDK_INCLUDE_DIRS})
+include_directories(SYSTEM ${ODBC_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 include_directories(include)
 
@@ -146,8 +149,8 @@ endif ()
 
 set_target_properties(${TARGET} PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
+target_link_libraries(${TARGET} aws-cpp-sdk-core aws-cpp-sdk-timestream-query aws-cpp-sdk-sts)
 target_link_libraries(${TARGET} ${ODBC_LIBRARIES})
-target_link_libraries(${TARGET} ${AWSSDK_LINK_LIBRARIES})
 
 add_definitions(-DUNICODE=1)
 add_definitions(-DPROJECT_VERSION=${CMAKE_PROJECT_VERSION})
@@ -196,7 +199,14 @@ if (WIN32 AND ${WITH_ODBC_MSI})
     set(WIX_ODBC_AWS_CRT_CPP ".\\aws-crt-cpp.dll")
     set(WIX_ODBC_AWS_C_S3 ".\\aws-c-s3.dll")
     set(WIX_ODBC_AWS_C_SDKUTILS ".\\aws-c-sdkutils.dll")
-    set(WIX_ODBC_ZLIB ".\\zlib1.dll")
+    # vcpkg names zlib's debug build zlibd1.dll and release zlib1.dll. The MSI must
+    # package the variant that matches the driver's build type.
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(WIX_ODBC_ZLIB_NAME "zlibd1.dll")
+    else()
+        set(WIX_ODBC_ZLIB_NAME "zlib1.dll")
+    endif()
+    set(WIX_ODBC_ZLIB ".\\${WIX_ODBC_ZLIB_NAME}")
 
     set(WIX_PROJECT_NAME "Amazon Timestream")
     set(WIX_MANUFACTURER "Amazon Web Services")

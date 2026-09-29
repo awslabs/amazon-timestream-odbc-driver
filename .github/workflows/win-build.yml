@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: TruffleHog OSS
@@ -79,7 +79,7 @@ jobs:
     runs-on: windows-2022
     needs: trufflehog-git-secrets-scan
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install Chocolatey
       run: |
@@ -99,7 +99,7 @@ jobs:
 
     - name: Cache dependencies Windows 32
       id: cache-dependencies-windows-32
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: | 
           ${{ env.VCPKG_ROOT }}
@@ -193,7 +193,7 @@ jobs:
 
     - name: "Configure AWS credentials"
       if: ${{ env.SIGNING_ENABLED == 'true' }}
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         role-skip-session-tagging: true
         aws-access-key-id: ${{ secrets.AWS_SIGNING_ACCESS_KEY_ID }}
@@ -224,7 +224,7 @@ jobs:
     runs-on: windows-2022
     needs: trufflehog-git-secrets-scan
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install Chocolatey
       run: |
@@ -244,7 +244,7 @@ jobs:
 
     - name: Cache dependencies Windows 64
       id: cache-dependencies-windows-64
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: | 
           ${{ env.VCPKG_ROOT }}
@@ -338,7 +338,7 @@ jobs:
 
     - name: "Configure AWS credentials"
       if: ${{ env.SIGNING_ENABLED == 'true' }}
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         role-skip-session-tagging: true
         aws-access-key-id: ${{ secrets.AWS_SIGNING_ACCESS_KEY_ID }}
@@ -369,7 +369,7 @@ jobs:
     runs-on: windows-2022
     needs: trufflehog-git-secrets-scan
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install Chocolatey
       run: |
@@ -395,7 +395,7 @@ jobs:
 
     - name: Cache dependencies Windows 64
       id: cache-dependencies-windows-64
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: | 
           ${{ env.VCPKG_ROOT }}
@@ -447,7 +447,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-windows64_coverage
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Retrieve coverage
       uses: actions/download-artifact@v4

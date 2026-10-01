@@ -196,6 +196,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-skip-session-tagging: true
+        role-chaining: true
         aws-access-key-id: ${{ secrets.AWS_SIGNING_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SIGNING_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SIGNING_SESSION_TOKEN }}
@@ -341,6 +342,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-skip-session-tagging: true
+        role-chaining: true
         aws-access-key-id: ${{ secrets.AWS_SIGNING_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SIGNING_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SIGNING_SESSION_TOKEN }}

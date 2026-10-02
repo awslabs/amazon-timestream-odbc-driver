@@ -50,7 +50,7 @@ function Invoke-SignFile {
 
     # Upload unsigned .exe to S3 Bucket
     Write-Host "Obtaining version id and uploading unsigned .exe to S3 Bucket"
-    $versionId = $( aws s3api put-object --bucket $AwsUnsignedBucket --key $AwsKey --body $SourcePath --acl bucket-owner-full-control | jq '.VersionId' )
+    $versionId = $( aws s3api put-object --bucket $AwsUnsignedBucket --key $AwsKey --body $SourcePath --acl bucket-owner-full-control | jq -r '.VersionId' )
     $jobId = ""
 
     if ([string]::IsNullOrEmpty($versionId)) {
@@ -80,23 +80,26 @@ function Invoke-SignFile {
 
     Write-Host "Job ID: " $jobId
 
-    # Poll signed S3 bucket to see if the signed artifact is there, will retry up to 3 times before exiting with a failure code.
-    # Will sleep for 5 seconds between retries.
-    Write-Host "Poll signed S3 bucket to see if the signed artifact is there"
+    # Poll the signed S3 bucket by attempting to download the signed artifact directly, retrying up
+    # to 3 times before exiting with a failure code, sleeping 5 seconds between retries.
+    Write-Host "Poll signed S3 bucket by downloading the signed artifact to $TargetPath"
+    $downloaded = $false
     for ( $i = 0; $i -lt 3; $i++ ) {
-        aws s3api wait object-exists --bucket $AwsSignedBucket --key $AwsKey-$jobId
-        # Check if successful
+        aws s3api get-object --bucket $AwsSignedBucket --key $AwsKey-$jobId $TargetPath
+
         if ( $LASTEXITCODE -eq 0 ) {
+            $downloaded = $true
             break
         }
-    
+
         Write-Host "Will sleep for 5 seconds between retries."
         Start-Sleep -Seconds 5
     }
 
-    # Get signed EXE from S3
-    Write-Host "Get signed EXE from S3 to $TargetPath"
-    aws s3api get-object --bucket $AwsSignedBucket --key $AwsKey-$jobId $TargetPath
+    if ( -not $downloaded ) {
+        Write-Host "Exiting because signed artifact was not available for download"
+        return $false
+    }
 
     Write-Host "Signing completed"
     return $true
